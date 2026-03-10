@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Upload - Mummy J Emporium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #12256B;
+            --blue: #446CFF;
+            --bg: #F2F2F2;
+            --red: #ff3b30;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 40px 20px; color: var(--navy); }
+        .upload-container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 30px; position: relative; }
+        h1 { font-family: 'Anton'; text-align: center; margin-bottom: 30px; letter-spacing: 1px; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 14px; }
+        input, select { 
+            width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 12px; 
+            box-sizing: border-box; outline: none; font-family: 'Inter';
+        }
+        
+        .image-preview { 
+            width: 100%; height: 200px; border: 2px dashed #ddd; border-radius: 12px; 
+            margin-top: 10px; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; background: #fafafa;
+        }
+        .image-preview img { width: 100%; height: 100%; object-fit: contain; }
+
+        .btn-upload { 
+            background: var(--navy); color: white; border: none; width: 100%; 
+            padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; 
+            margin-top: 20px; transition: 0.3s;
+        }
+
+        /* --- LOADING INDICATOR STYLES --- */
+        #loadingOverlay {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(18, 37, 107, 0.85); /* Semi-transparent Navy */
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            backdrop-filter: blur(5px);
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-text { font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+
+        /* Inventory Styles */
+        .inventory-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; }
+        .status-badge { font-size: 12px; font-weight: 700; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
+        .status-in { background: #e8f0fe; color: var(--blue); }
+        .status-out { background: #fee8e8; color: var(--red); }
+        .action-btns { display: flex; gap: 10px; }
+        .btn-action { border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px; }
+        .back-link { display: block; text-align: center; margin-top: 20px; color: #888; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<div id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="statusText">Connecting...</div>
+</div>
+
+<div class="upload-container">
+    <h1>UPLOAD PRODUCT</h1>
+    
+    <div class="form-group">
+        <label>Product Image</label>
+        <input type="file" id="imageInput" accept="image/*" onchange="previewImage(event)">
+        <div class="image-preview" id="previewContainer">
+            <span id="previewText">No image selected</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Product Name</label>
+        <input type="text" id="itemName" placeholder="e.g. Luxury Leather Tote">
+    </div>
+
+    <div class="form-group">
+        <label>Category</label>
+        <select id="itemCategory">
+            <option value="Handbags">Handbags</option>
+            <option value="Wallets">Wallets</option>
+            <option value="Accessories">Accessories</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Price (₦)</label>
+        <input type="number" id="itemPrice" placeholder="e.g. 55000">
+    </div>
+
+    <button class="btn-upload" id="submitBtn" onclick="uploadProduct()">PUBLISH PRODUCT</button>
+    <a href="index.html" class="back-link">← Back to Store</a>
+</div>
+
+<div class="upload-container">
+    <h1>MANAGE INVENTORY</h1>
+    <div id="inventoryList">
+        <p style="text-align: center; color: #888;">Checking permissions...</p>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlGgRRrPP67b7EHyYm_eL1R08zFi08aLg",
+        authDomain: "mummy-jweb.firebaseapp.com",
+        projectId: "mummy-jweb",
+        storageBucket: "mummy-jweb.firebasestorage.app",
+        messagingSenderId: "924167105238",
+        appId: "1:924167105238:web:56261faee1ca1ee9d7b777",
+        measurementId: "G-YMNFG7ZRV4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    const auth = getAuth(app);
+
+    const ADMIN_UID = "tPgPOqy3aPU4HeIAvWm6t64N3hG3";
+    const overlay = document.getElementById('loadingOverlay');
+    const statusText = document.getElementById('statusText');
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user || user.uid !== ADMIN_UID) {
+            window.location.href = "login.html";
+        } else {
+            loadInventory();
+        }
+    });
+
+    window.previewImage = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                document.getElementById('previewContainer').innerHTML = `<img src="${reader.result}">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    window.uploadProduct = async () => {
+        const file = document.getElementById('imageInput').files[0];
+        const name = document.getElementById('itemName').value;
+        const category = document.getElementById('itemCategory').value;
+        const price = document.getElementById('itemPrice').value;
+
+        if (!file || !name || !price) return alert("Please fill all fields.");
+
+        try {
+            // SHOW LOADING INDICATOR
+            overlay.style.display = "flex";
+            statusText.innerText = "Connecting to Server...";
+
+            // Step 1: Upload Image
+            statusText.innerText = "Uploading Bag Image...";
+            const storageRef = ref(storage, `products/${Date.now()}_${file.name}`);
+            const snapshot = await uploadBytes(storageRef, file);
+            const downloadURL = await getDownloadURL(snapshot.ref);
+
+            // Step 2: Save to Database
+            statusText.innerText = "Finalizing Product Details...";
+            await addDoc(collection(db, "products"), {
+                name: name.trim(),
+                category: category,
+                price: Number(price),
+                img: downloadURL,
+                inStock: true,
+                createdAt: serverTimestamp()
+            });
+
+            overlay.style.display = "none";
+            alert("Success!");
+            location.reload(); 
+        } catch (error) {
+            overlay.style.display = "none";
+            console.error(error);
+            alert("Error: " + error.message);
+        }
+    };
+
+    async function loadInventory() {
+        const container = document.getElementById('inventoryList');
+        try {
+            const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
+            const querySnapshot = await getDocs(q);
+            container.innerHTML = "";
+            querySnapshot.forEach((productDoc) => {
+                const data = productDoc.data();
+                const isInStock = data.inStock !== false;
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "inventory-item";
+                itemDiv.innerHTML = `
+                    <div>
+                        <strong>${data.name}</strong><br>
+                        <span class="status-badge ${isInStock ? 'status-in' : 'status-out'}">${isInStock ? 'In Stock' : 'Sold Out'}</span>
+                    </div>
+                    <div class="action-btns">
+                        <button class="btn-action" style="background:var(--navy); color:white;" onclick="toggleStock('${productDoc.id}', ${isInStock})">Toggle Status</button>
+                        <button class="btn-action" style="background:#eee; color:red;" onclick="deleteProduct('${productDoc.id}')">Delete</button>
+                    </div>
+                `;
+                container.appendChild(itemDiv);
+            });
+        } catch (e) { container.innerHTML = "Error loading list."; }
+    }
+
+    window.toggleStock = async (id, status) => {
+        overlay.style.display = "flex";
+        statusText.innerText = "Updating Stock...";
+        await updateDoc(doc(db, "products", id), { inStock: !status });
+        overlay.style.display = "none";
+        loadInventory();
+    };
+
+    window.deleteProduct = async (id) => {
+        if (!confirm("Delete?")) return;
+        overlay.style.display = "flex";
+        statusText.innerText = "Deleting Item...";
+        await deleteDoc(doc(db, "products", id));
+        overlay.style.display = "none";
+        loadInventory();
+    };
+</script>
+
+</body>
+</html>

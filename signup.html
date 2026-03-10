@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Mummy J</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #12256B;
+            --blue: #446CFF;
+        }
+        body { font-family: 'Inter', sans-serif; background: #F2F2F2; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .auth-card { background: white; padding: 40px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        h1 { font-family: 'Anton'; color: var(--navy); margin-bottom: 10px; letter-spacing: 1px; }
+        p { color: #666; font-size: 14px; margin-bottom: 30px; line-height: 1.6; }
+        input { 
+            width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; 
+            border-radius: 12px; box-sizing: border-box; outline: none;
+            transition: border-color 0.3s ease;
+        }
+        input:focus { border-color: var(--blue); }
+        .btn-auth { 
+            background: var(--navy); color: white; border: none; width: 100%; 
+            padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; 
+            margin-top: 10px; transition: background 0.3s ease;
+        }
+        .btn-auth:hover { background: var(--blue); }
+        .footer-links { margin-top: 20px; font-size: 13px; color: #777; }
+        .footer-links a { color: var(--blue); text-decoration: none; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div class="auth-card">
+    <h1>CREATE ACCOUNT</h1>
+    <p>Sign up to start shopping or manage your emporium.</p>
+    
+    <input type="email" id="email" placeholder="Email Address">
+    <input type="password" id="password" placeholder="Create Password">
+    <input type="password" id="confirmPassword" placeholder="Confirm Password">
+    
+    <button class="btn-auth" id="signupBtn" onclick="handleSignUp()">CREATE ACCOUNT</button>
+
+    <div class="footer-links">
+        Already have an account? <a href="login.html">Login</a>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlGgRRrPP67b7EHyYm_eL1R08zFi08aLg",
+        authDomain: "mummy-jweb.firebaseapp.com",
+        projectId: "mummy-jweb",
+        storageBucket: "mummy-jweb.firebasestorage.app",
+        messagingSenderId: "924167105238",
+        appId: "1:924167105238:web:56261faee1ca1ee9d7b777",
+        measurementId: "G-YMNFG7ZRV4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.handleSignUp = async () => {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('password').value;
+        const confirm = document.getElementById('confirmPassword').value;
+        const btn = document.getElementById('signupBtn');
+
+        if (!email || !pass) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        if (pass !== confirm) {
+            alert("Passwords do not match!");
+            return;
+        }
+
+        if (pass.length < 6) {
+            alert("Password should be at least 6 characters.");
+            return;
+        }
+
+        try {
+            btn.innerText = "CREATING...";
+            btn.disabled = true;
+
+            await createUserWithEmailAndPassword(auth, email, pass);
+            
+            alert("Account created successfully!");
+            // Redirect to index for regular users. 
+            // Admin status is handled by the check in Catalog/Navbar.
+            window.location.href = "index.html"; 
+        } catch (error) {
+            alert("Error: " + error.message);
+            btn.innerText = "CREATE ACCOUNT";
+            btn.disabled = false;
+        }
+    };
+</script>
+</body>
+</html>

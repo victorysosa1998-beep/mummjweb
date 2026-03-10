@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Details - Mummy J Emporium</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;800&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --navy: #12256B;
+    --blue: #446CFF;
+    --pale-blue: #A9C0FF;
+    --bg-card: #F2F2F2;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; color: var(--navy); background-color: #fff; padding-top: 100px; }
+.container { max-width: 1300px; margin: 0 auto; padding: 0 5%; }
+
+/* --- NAVBAR --- */
+.navbar { 
+    position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+    background: white; display: flex; justify-content: space-between; 
+    align-items: center; padding: 15px 5%; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.logo-img { height: 55px; width: auto; cursor: pointer; }
+
+/* --- PRODUCT PAGE LAYOUT --- */
+.product-wrapper {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 60px;
+    padding: 40px 0;
+}
+
+/* LEFT SIDE: IMAGE GALLERY */
+.main-img-container {
+    background: var(--bg-card);
+    border-radius: 35px;
+    padding: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 500px;
+    position: relative;
+    overflow: hidden;
+}
+#displayImg {
+    width: 100%;
+    height: auto;
+    max-height: 500px;
+    object-fit: contain;
+    transition: opacity 0.3s ease;
+    opacity: 0; 
+}
+
+/* RIGHT SIDE: PRODUCT INFO */
+.product-info { position: sticky; top: 140px; height: fit-content; }
+.brand-label { color: var(--blue); font-weight: 700; letter-spacing: 2px; font-size: 12px; margin-bottom: 10px; display: block; }
+.product-title { font-family: 'Anton', sans-serif; font-size: 48px; line-height: 1.1; margin-bottom: 15px; text-transform: uppercase; }
+.product-price { font-size: 32px; font-weight: 800; color: var(--navy); margin-bottom: 30px; }
+.description { line-height: 1.6; color: #555; margin-bottom: 30px; }
+
+/* STOCK LABEL */
+.stock-label { font-size: 14px; font-weight: 700; color: #25d366; margin-bottom: 15px; display: block; }
+
+/* QUANTITY SELECTOR */
+.qty-wrapper { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
+.qty-btn { width: 40px; height: 40px; border: 1px solid #ddd; background: white; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: bold; }
+#qtyValue { font-weight: 800; width: 30px; text-align: center; }
+
+/* VARIATIONS */
+.selectors { margin-bottom: 40px; }
+.selector-label { font-weight: 700; margin-bottom: 15px; display: block; font-size: 14px; text-transform: uppercase; }
+.color-options { display: flex; gap: 12px; }
+.color-dot { 
+    width: 40px; height: 40px; border-radius: 50%; border: 2px solid #eee; 
+    cursor: pointer; transition: 0.3s; 
+}
+.color-dot.active { border-color: var(--blue); transform: scale(1.15); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+/* ACTIONS */
+.buy-actions { display: flex; flex-direction: column; gap: 15px; }
+.btn-atc { 
+    background: var(--navy); color: white; border: none; padding: 20px; 
+    border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; 
+    transition: 0.3s;
+}
+.btn-atc:hover { background: var(--blue); }
+.btn-whatsapp {
+    background: #25d366; color: white; border: none; padding: 20px; 
+    border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; 
+    text-align: center; text-decoration: none; display: block;
+    transition: transform 0.3s ease;
+}
+.btn-whatsapp:hover { transform: translateY(-3px); }
+
+/* FOOTER */
+.site-footer { background: var(--navy); color: #fff; padding: 40px 5%; margin-top: 80px; text-align: center; }
+
+@media (max-width: 992px) {
+    .product-wrapper { grid-template-columns: 1fr; }
+    .product-info { position: static; }
+    .main-img-container { min-height: 350px; padding: 30px; }
+}
+</style>
+</head>
+
+<body>
+
+<header class="navbar">
+    <div class="nav-left">
+        <a href="index.html"><img src="video/mjlogo1.png" alt="Mummy J Logo" class="logo-img"></a>
+    </div>
+</header>
+
+<main class="container">
+    <div class="product-wrapper">
+        <section class="image-gallery">
+            <div class="main-img-container">
+                <img id="displayImg" src="" alt="Product Image">
+            </div>
+        </section>
+
+        <section class="product-info">
+            <span class="brand-label" id="categoryLabel">LOADING...</span>
+            <h1 class="product-title" id="prodTitle">---</h1>
+            <p class="product-price" id="prodPrice">₦0.00</p>
+            
+            <span class="stock-label" id="stockDisplay">Checking stock...</span>
+            
+            <p class="description" id="prodDesc">Fetching product details...</p>
+
+            <div class="selectors" id="colorSelectorSection" style="display:none;">
+                <span class="selector-label">SELECT COLOR</span>
+                <div class="color-options" id="colorContainer"></div>
+            </div>
+
+            <div class="qty-wrapper">
+                <span class="selector-label" style="margin-bottom:0">QUANTITY</span>
+                <button class="qty-btn" onclick="updateQty(-1)">-</button>
+                <span id="qtyValue">1</span>
+                <button class="qty-btn" onclick="updateQty(1)">+</button>
+            </div>
+
+            <div class="buy-actions">
+                <button class="btn-atc" onclick="handleAddToCart()">ADD TO CART</button>
+                <a href="#" id="whatsappLink" class="btn-whatsapp" target="_blank">ORDER VIA WHATSAPP</a>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <p>© 2026 Mummy J Emporium. All Rights Reserved.</p>
+</footer>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlGgRRrPP67b7EHyYm_eL1R08zFi08aLg",
+        authDomain: "mummy-jweb.firebaseapp.com",
+        projectId: "mummy-jweb",
+        storageBucket: "mummy-jweb.firebasestorage.app",
+        messagingSenderId: "924167105238",
+        appId: "1:924167105238:web:56261faee1ca1ee9d7b777",
+        measurementId: "G-YMNFG7ZRV4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let currentProduct = null;
+    let selectedColorName = "Standard";
+    let quantity = 1;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+
+    async function initPage() {
+        if (!productId) {
+            window.location.href = "index.html";
+            return;
+        }
+        
+        try {
+            const docRef = doc(db, "products", productId);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                currentProduct = data;
+
+                document.getElementById('prodTitle').innerText = data.name;
+                document.getElementById('categoryLabel').innerText = data.category;
+                document.getElementById('prodDesc').innerText = data.description || "No description provided.";
+                document.getElementById('prodPrice').innerText = "₦" + Number(data.price).toLocaleString();
+                
+                document.getElementById('stockDisplay').innerText = data.stock > 0 ? `In Stock` : "Out of Stock";
+                if(data.stock <= 0) {
+                    document.getElementById('stockDisplay').style.color = "red";
+                    document.getElementById('stockDisplay').innerText = "Currently Out of Stock";
+                }
+
+                const container = document.getElementById('colorContainer');
+                if (data.colors && data.colors.length > 0) {
+                    document.getElementById('colorSelectorSection').style.display = 'block';
+                    data.colors.forEach((c, index) => {
+                        const dot = document.createElement('div');
+                        dot.className = 'color-dot' + (index === 0 ? ' active' : '');
+                        dot.style.background = c.hex;
+                        dot.onclick = () => selectColor(c.img, c.name, dot);
+                        container.appendChild(dot);
+                    });
+                    selectColor(data.colors[0].img, data.colors[0].name, container.firstChild);
+                } else {
+                    const img = document.getElementById('displayImg');
+                    img.src = data.img || data.image || 'placeholder.jpg';
+                    img.onload = () => img.style.opacity = '1';
+                }
+                updateWhatsAppLink();
+            } else {
+                alert("Product not found.");
+                window.location.href = "index.html";
+            }
+        } catch (error) {
+            console.error("Error fetching product:", error);
+        }
+    }
+
+    window.selectColor = function(imgSrc, colorName, element) {
+        selectedColorName = colorName;
+        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+        element.classList.add('active');
+
+        const img = document.getElementById('displayImg');
+        img.style.opacity = '0';
+        setTimeout(() => {
+            img.src = imgSrc;
+            img.onload = () => img.style.opacity = '1';
+            updateWhatsAppLink();
+        }, 250);
+    }
+
+    window.updateQty = function(val) {
+        quantity = Math.max(1, quantity + val);
+        document.getElementById('qtyValue').innerText = quantity;
+        updateWhatsAppLink();
+    }
+
+    function updateWhatsAppLink() {
+        if (!currentProduct) return;
+        const colorText = selectedColorName !== "Standard" ? `\n*Color:* ${selectedColorName}` : "";
+        const msg = `Hello Mummy J Emporium, I'd like to order:\n\n*Product:* ${currentProduct.name}${colorText}\n*Qty:* ${quantity}\n*Price:* ${document.getElementById('prodPrice').innerText}\n\nIs this available?`;
+        document.getElementById('whatsappLink').href = `https://wa.me/2348123541592?text=${encodeURIComponent(msg)}`;
+    }
+
+    window.handleAddToCart = function() {
+        if (!currentProduct) return;
+        let cart = JSON.parse(localStorage.getItem('mj_cart')) || [];
+        
+        const cartItem = {
+            id: productId,
+            name: currentProduct.name,
+            price: currentProduct.price,
+            color: selectedColorName,
+            image: document.getElementById('displayImg').src,
+            qty: quantity
+        };
+
+        cart.push(cartItem);
+        localStorage.setItem('mj_cart', JSON.stringify(cart));
+        
+        alert(`${quantity}x ${currentProduct.name} added to cart!`);
+        window.location.href = "cart.html";
+    }
+
+    initPage();
+</script>
+
+</body>
+</html>

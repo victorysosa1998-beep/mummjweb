@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Mummy J Emporium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #12256B;
+            --blue: #446CFF;
+        }
+        body { font-family: 'Inter', sans-serif; background: #F2F2F2; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .login-card { background: white; padding: 40px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        h1 { font-family: 'Anton'; color: var(--navy); margin-bottom: 30px; letter-spacing: 1px; }
+        input { 
+            width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; 
+            border-radius: 12px; box-sizing: border-box; outline: none;
+            transition: border-color 0.3s ease;
+        }
+        input:focus { border-color: var(--blue); }
+        .btn-admin { 
+            background: var(--navy); color: white; border: none; width: 100%; 
+            padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; 
+            margin-top: 10px; transition: background 0.3s ease;
+        }
+        .btn-admin:hover { background: var(--blue); }
+        .btn-guest { 
+            background: none; color: var(--blue); border: 2px solid var(--blue); 
+            width: 100%; padding: 15px; border-radius: 12px; font-weight: 700; 
+            cursor: pointer; margin-top: 20px; transition: all 0.3s ease;
+        }
+        .btn-guest:hover { background: var(--blue); color: white; }
+        .divider { margin: 25px 0; color: #aaa; font-size: 12px; position: relative; font-weight: 700; }
+        .auth-footer { margin-top: 15px; font-size: 12px; color: #666; }
+        .auth-footer a { color: var(--navy); text-decoration: none; font-weight: 700; }
+        .forgot-link { display: block; margin-top: 10px; color: #888; text-decoration: none; font-size: 11px; transition: color 0.3s; }
+        .forgot-link:hover { color: var(--blue); }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h1>MUMMY J</h1>
+    
+    <div id="admin-section">
+        <input type="email" id="email" placeholder="Email Address">
+        <input type="password" id="password" placeholder="Password">
+        <button class="btn-admin" id="loginBtn" onclick="adminLogin()">LOGIN</button>
+        
+        <a href="forgot-password.html" class="forgot-link">Forgot Password?</a>
+    </div>
+
+    <div class="divider">OR</div>
+
+    <button class="btn-guest" id="guestBtn" onclick="guestLogin()">ENTER AS GUEST</button>
+
+    <div class="auth-footer">
+        Don't have an account? <a href="signup.html">Sign Up</a>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlGgRRrPP67b7EHyYm_eL1R08zFi08aLg",
+        authDomain: "mummy-jweb.firebaseapp.com",
+        projectId: "mummy-jweb",
+        storageBucket: "mummy-jweb.firebasestorage.app",
+        messagingSenderId: "924167105238",
+        appId: "1:924167105238:web:56261faee1ca1ee9d7b777",
+        measurementId: "G-YMNFG7ZRV4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const ADMIN_EMAIL = "your-admin-email@example.com"; // Replace with your admin email
+
+    window.adminLogin = async () => {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('password').value;
+        const btn = document.getElementById('loginBtn');
+
+        if(!email || !pass) return alert("Please fill in all fields");
+
+        try {
+            btn.innerText = "VERIFYING...";
+            const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+            
+            // Redirect to upload if Admin, else go to index
+            if(userCredential.user.email === ADMIN_EMAIL) {
+                window.location.href = "upload.html"; 
+            } else {
+                window.location.href = "index.html";
+            }
+        } catch (error) {
+            alert("Login Failed: " + error.message);
+            btn.innerText = "LOGIN";
+        }
+    };
+
+    window.guestLogin = async () => {
+        const btn = document.getElementById('guestBtn');
+        try {
+            btn.innerText = "ENTERING...";
+            await signInAnonymously(auth);
+            window.location.href = "index.html"; 
+        } catch (error) {
+            alert("Guest entry failed: " + error.message);
+            btn.innerText = "ENTER AS GUEST";
+        }
+    };
+</script>
+
+</body>
+</html>

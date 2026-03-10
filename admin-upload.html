@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Upload Product</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #12256B;
+            --blue: #446CFF;
+        }
+        body { font-family: 'Inter', sans-serif; background: #f4f7fe; padding: 40px; margin: 0; }
+        .admin-box { max-width: 600px; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin: 0 auto; }
+        h2 { color: var(--navy); margin: 0; }
+        h4 { margin: 20px 0 10px 0; color: #555; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; outline: none; }
+        input:focus, textarea:focus { border-color: var(--blue); }
+        
+        .color-group { border: 1px solid #eee; padding: 15px; border-radius: 10px; margin-top: 10px; background: #fafafa; position: relative; }
+        .file-input-label { display: block; background: #eee; padding: 10px; text-align: center; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; color: #555; margin-top: 5px; border: 2px dashed #ccc; }
+        .file-input-label:hover { background: #e5e5e5; }
+        
+        .btn-save { background: var(--navy); color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        .btn-save:hover { background: var(--blue); }
+        .btn-save:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .btn-add-color { background: var(--blue); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; }
+        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .logout-link { font-size: 13px; color: #ff4444; cursor: pointer; text-decoration: none; font-weight: 600; }
+        
+        .remove-var { color: #ff4444; font-size: 11px; cursor: pointer; text-align: right; display: block; margin-top: 5px; font-weight: 600; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-box">
+        <div class="header-flex">
+            <h2>New Product</h2>
+            <span class="logout-link" onclick="adminLogout()">Sign Out</span>
+        </div>
+        
+        <input type="text" id="pName" placeholder="Product Name (e.g. Vernissage Classic)">
+        <input type="text" id="pCategory" placeholder="Category (e.g. Luxury Handbags)">
+        <input type="number" id="pPrice" placeholder="Price (₦)">
+        <input type="number" id="pStock" placeholder="Stock Quantity">
+        <textarea id="pDesc" rows="4" placeholder="Product Description..."></textarea>
+        
+        <div id="colorFields">
+            <div class="header-flex" style="margin-bottom: 5px;">
+                <h4>Variations & Images</h4>
+                <button class="btn-add-color" onclick="addColorField()">+ Add Color</button>
+            </div>
+            
+            <div class="color-group">
+                <input type="text" class="cName" placeholder="Color Name (e.g. Midnight Black)">
+                <input type="text" class="cHex" placeholder="Color Hex Code (e.g. #000000)">
+                <label class="file-input-label">
+                    <span>Click to Upload Image</span>
+                    <input type="file" class="cFile" accept="image/*" style="display:none" onchange="updateLabel(this)">
+                </label>
+            </div>
+        </div>
+
+        <button id="uploadBtn" class="btn-save" onclick="saveToFirebase()">UPLOAD TO EMPORIUM</button>
+        <p id="statusMsg" style="text-align: center; margin-top: 15px; font-size: 14px; font-weight: 600;"></p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBlGgRRrPP67b7EHyYm_eL1R08zFi08aLg",
+            authDomain: "mummy-jweb.firebaseapp.com",
+            projectId: "mummy-jweb",
+            storageBucket: "mummy-jweb.firebasestorage.app",
+            messagingSenderId: "924167105238",
+            appId: "1:924167105238:web:56261faee1ca1ee9d7b777",
+            measurementId: "G-YMNFG7ZRV4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const storage = getStorage(app);
+
+        const ADMIN_UID = "tPgPOqy3aPU4HeIAvWm6t64N3hG3";
+
+        // Access Control
+        onAuthStateChanged(auth, (user) => {
+            if (!user || user.uid !== ADMIN_UID) {
+                window.location.href = "login.html";
+            }
+        });
+
+        window.adminLogout = () => {
+            signOut(auth).then(() => window.location.href = "login.html");
+        };
+
+        window.updateLabel = (input) => {
+            const label = input.parentElement.querySelector('span');
+            label.innerText = input.files[0] ? `Selected: ${input.files[0].name}` : "Click to Upload Image";
+            label.style.color = "#446CFF";
+        };
+
+        window.addColorField = () => {
+            const container = document.getElementById('colorFields');
+            const div = document.createElement('div');
+            div.className = 'color-group';
+            div.innerHTML = `
+                <input type="text" class="cName" placeholder="Color Name">
+                <input type="text" class="cHex" placeholder="Color Hex">
+                <label class="file-input-label">
+                    <span>Click to Upload Image</span>
+                    <input type="file" class="cFile" accept="image/*" style="display:none" onchange="updateLabel(this)">
+                </label>
+                <span class="remove-var" onclick="this.parentElement.remove()">Remove Color</span>
+            `;
+            container.appendChild(div);
+        };
+
+        window.saveToFirebase = async () => {
+            const btn = document.getElementById('uploadBtn');
+            const status = document.getElementById('statusMsg');
+            const name = document.getElementById('pName').value;
+            const price = document.getElementById('pPrice').value;
+
+            if(!name || !price) {
+                alert("Name and Price are required.");
+                return;
+            }
+
+            btn.innerText = "UPLOADING IMAGES & DATA...";
+            btn.disabled = true;
+
+            try {
+                const colorGroups = document.querySelectorAll('.color-group');
+                const colorsArray = [];
+                
+                for (let group of colorGroups) {
+                    const cName = group.querySelector('.cName').value;
+                    const fileInput = group.querySelector('.cFile');
+                    
+                    if(cName && fileInput.files[0]) {
+                        // 1. Upload file to Storage
+                        const file = fileInput.files[0];
+                        const storageRef = ref(storage, `products/${Date.now()}_${file.name}`);
+                        const snapshot = await uploadBytes(storageRef, file);
+                        const downloadURL = await getDownloadURL(snapshot.ref);
+
+                        colorsArray.push({
+                            name: cName,
+                            hex: group.querySelector('.cHex').value || "#12256B",
+                            img: downloadURL
+                        });
+                    }
+                }
+
+                if (colorsArray.length === 0) throw new Error("Please add at least one color variation with an image.");
+
+                // 2. Save to Firestore
+                const productData = {
+                    name: name,
+                    category: document.getElementById('pCategory').value || "Collection",
+                    price: parseFloat(price),
+                    stock: parseInt(document.getElementById('pStock').value) || 0,
+                    description: document.getElementById('pDesc').value,
+                    colors: colorsArray,
+                    img: colorsArray[0].img, // Main display image
+                    createdAt: serverTimestamp()
+                };
+
+                await addDoc(collection(db, "products"), productData);
+                status.style.color = "green";
+                status.innerText = "Bag successfully uploaded to Emporium!";
+                setTimeout(() => window.location.reload(), 2000);
+
+            } catch (error) {
+                status.style.color = "red";
+                status.innerText = "Error: " + error.message;
+                btn.innerText = "UPLOAD TO EMPORIUM";
+                btn.disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>
