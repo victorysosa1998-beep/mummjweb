@@ -14,6 +14,8 @@
     --blue: #446CFF;
     --pale-blue: #A9C0FF;
     --bg-card: #F2F2F2;
+    --danger: #ff3b30;
+    --success: #28a745;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -36,7 +38,6 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); background-color: #
     padding: 40px 0;
 }
 
-/* LEFT SIDE: IMAGE GALLERY */
 .main-img-container {
     background: var(--bg-card);
     border-radius: 35px;
@@ -46,121 +47,138 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); background-color: #
     align-items: center;
     min-height: 500px;
     position: relative;
-    overflow: hidden;
 }
+
 #displayImg {
     width: 100%;
-    height: auto;
     max-height: 500px;
     object-fit: contain;
-    transition: opacity 0.3s ease;
-    opacity: 0; 
-}
-
-/* RIGHT SIDE: PRODUCT INFO */
-.product-info { position: sticky; top: 140px; height: fit-content; }
-.brand-label { color: var(--blue); font-weight: 700; letter-spacing: 2px; font-size: 12px; margin-bottom: 10px; display: block; }
-.product-title { font-family: 'Anton', sans-serif; font-size: 48px; line-height: 1.1; margin-bottom: 15px; text-transform: uppercase; }
-.product-price { font-size: 32px; font-weight: 800; color: var(--navy); margin-bottom: 30px; }
-.description { line-height: 1.6; color: #555; margin-bottom: 30px; }
-
-/* STOCK LABEL */
-.stock-label { font-size: 14px; font-weight: 700; color: #25d366; margin-bottom: 15px; display: block; }
-
-/* QUANTITY SELECTOR */
-.qty-wrapper { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
-.qty-btn { width: 40px; height: 40px; border: 1px solid #ddd; background: white; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: bold; }
-#qtyValue { font-weight: 800; width: 30px; text-align: center; }
-
-/* VARIATIONS */
-.selectors { margin-bottom: 40px; }
-.selector-label { font-weight: 700; margin-bottom: 15px; display: block; font-size: 14px; text-transform: uppercase; }
-.color-options { display: flex; gap: 12px; }
-.color-dot { 
-    width: 40px; height: 40px; border-radius: 50%; border: 2px solid #eee; 
-    cursor: pointer; transition: 0.3s; 
-}
-.color-dot.active { border-color: var(--blue); transform: scale(1.15); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-
-/* ACTIONS */
-.buy-actions { display: flex; flex-direction: column; gap: 15px; }
-.btn-atc { 
-    background: var(--navy); color: white; border: none; padding: 20px; 
-    border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; 
     transition: 0.3s;
 }
-.btn-atc:hover { background: var(--blue); }
-.btn-whatsapp {
-    background: #25d366; color: white; border: none; padding: 20px; 
-    border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; 
-    text-align: center; text-decoration: none; display: block;
-    transition: transform 0.3s ease;
-}
-.btn-whatsapp:hover { transform: translateY(-3px); }
 
-/* FOOTER */
-.site-footer { background: var(--navy); color: #fff; padding: 40px 5%; margin-top: 80px; text-align: center; }
+.product-info { position: sticky; top: 140px; height: fit-content; }
+.brand-label { color: var(--blue); font-weight: 700; letter-spacing: 2px; font-size: 12px; margin-bottom: 10px; display: block; }
+.product-title { font-family: 'Anton', sans-serif; font-size: 48px; line-height: 1.1; margin-bottom: 15px; }
+.product-price { font-size: 32px; font-weight: 800; color: var(--navy); margin-bottom: 20px; }
 
-@media (max-width: 992px) {
-    .product-wrapper { grid-template-columns: 1fr; }
-    .product-info { position: static; }
-    .main-img-container { min-height: 350px; padding: 30px; }
+/* DESCRIPTION STYLE */
+.product-description {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 25px;
+    white-space: pre-line;
 }
+
+/* STOCK STATUS INDICATOR */
+.stock-status-badge {
+    display: inline-block;
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+.status-in { background: #e8f5e9; color: var(--success); }
+.status-out { background: #ffebee; color: var(--danger); }
+
+/* --- THE COLOR CIRCLES SECTION --- */
+.color-section { margin: 25px 0; }
+.selector-label { font-weight: 700; font-size: 13px; color: #888; margin-bottom: 15px; display: block; letter-spacing: 1px; }
+.color-grid { display: flex; gap: 15px; flex-wrap: wrap; }
+.color-swatch {
+    width: 35px; 
+    height: 35px; 
+    border-radius: 50%; /* This makes it a circle */
+    border: 2px solid #ddd; 
+    cursor: pointer; 
+    transition: 0.3s;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.color-swatch.active { 
+    border-color: var(--blue); 
+    transform: scale(1.2); 
+    box-shadow: 0 0 10px rgba(68, 108, 255, 0.4);
+}
+
+.buy-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 30px; }
+.btn-atc { background: var(--navy); color: white; border: none; padding: 20px; border-radius: 15px; font-weight: 700; cursor: pointer; }
+.btn-whatsapp { background: #25d366; color: white; text-align: center; padding: 20px; border-radius: 15px; text-decoration: none; font-weight: 700; }
+
+/* ADMIN PANEL */
+#adminControls {
+    margin-top: 40px; padding: 25px; background: #fff; 
+    border: 3px solid #000; border-radius: 25px; display: none; 
+}
+.admin-header { font-size: 14px; font-weight: 900; color: #000; margin-bottom: 15px; display: block; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; margin-bottom: 15px; }
+.btn-del { width: 100%; background: #fff; color: var(--danger); border: 1px solid var(--danger); padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+
+/* TOGGLE SWITCH */
+.switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--success); }
+input:checked + .slider:before { transform: translateX(24px); }
+
+.debug-btn { position: fixed; bottom: 10px; left: 10px; font-size: 10px; opacity: 0.3; background: #000; color: #fff; border: none; padding: 5px; cursor: pointer; }
 </style>
 </head>
-
 <body>
 
 <header class="navbar">
-    <div class="nav-left">
-        <a href="index.html"><img src="video/mjlogo1.png" alt="Mummy J Logo" class="logo-img"></a>
-    </div>
+    <a href="index.html"><img src="video/mjlogo1.png" alt="Logo" class="logo-img"></a>
 </header>
 
 <main class="container">
     <div class="product-wrapper">
-        <section class="image-gallery">
-            <div class="main-img-container">
-                <img id="displayImg" src="" alt="Product Image">
-            </div>
-        </section>
+        <div class="main-img-container">
+            <img id="displayImg" src="" alt="Product">
+        </div>
 
-        <section class="product-info">
-            <span class="brand-label" id="categoryLabel">LOADING...</span>
-            <h1 class="product-title" id="prodTitle">---</h1>
-            <p class="product-price" id="prodPrice">₦0.00</p>
+        <div class="product-info">
+            <span class="brand-label" id="catLabel">COLLECTION</span>
+            <h1 id="pName" class="product-title">Loading...</h1>
+            <p id="pPrice" class="product-price">₦0</p>
             
-            <span class="stock-label" id="stockDisplay">Checking stock...</span>
-            
-            <p class="description" id="prodDesc">Fetching product details...</p>
+            <div id="pDesc" class="product-description"></div>
 
-            <div class="selectors" id="colorSelectorSection" style="display:none;">
-                <span class="selector-label">SELECT COLOR</span>
-                <div class="color-options" id="colorContainer"></div>
-            </div>
+            <div id="stockBadge" class="stock-status-badge">Checking...</div>
 
-            <div class="qty-wrapper">
-                <span class="selector-label" style="margin-bottom:0">QUANTITY</span>
-                <button class="qty-btn" onclick="updateQty(-1)">-</button>
-                <span id="qtyValue">1</span>
-                <button class="qty-btn" onclick="updateQty(1)">+</button>
+            <div class="color-section" id="colorArea" style="display:none;">
+                <span class="selector-label">AVAILABLE COLORS</span>
+                <div class="color-grid" id="colorGrid"></div>
             </div>
 
             <div class="buy-actions">
-                <button class="btn-atc" onclick="handleAddToCart()">ADD TO CART</button>
-                <a href="#" id="whatsappLink" class="btn-whatsapp" target="_blank">ORDER VIA WHATSAPP</a>
+                <button class="btn-atc" id="atcBtn" onclick="addToCart()">ADD TO CART</button>
+                <a href="#" id="waBtn" class="btn-whatsapp" target="_blank">ORDER VIA WHATSAPP</a>
             </div>
-        </section>
+
+            <div id="adminControls">
+                <span class="admin-header">MUMMY J ADMIN PANEL</span>
+                <div class="toggle-row">
+                    <span style="font-weight:700; font-size:14px;">Toggle In-Stock Status</span>
+                    <label class="switch">
+                        <input type="checkbox" id="stockToggle" onchange="handleStockUpdate(this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <button class="btn-del" onclick="handleDelete()">Delete Product</button>
+            </div>
+        </div>
     </div>
 </main>
 
-<footer class="site-footer">
-    <p>© 2026 Mummy J Emporium. All Rights Reserved.</p>
-</footer>
+<button class="debug-btn" onclick="checkUID()">Debug Login</button>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlGgRRrPP67b7EHyYm_eL1R08zFi08aLg",
@@ -168,119 +186,135 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); background-color: #
         projectId: "mummy-jweb",
         storageBucket: "mummy-jweb.firebasestorage.app",
         messagingSenderId: "924167105238",
-        appId: "1:924167105238:web:56261faee1ca1ee9d7b777",
-        measurementId: "G-YMNFG7ZRV4"
+        appId: "1:924167105238:web:56261faee1ca1ee9d7b777"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
 
-    let currentProduct = null;
-    let selectedColorName = "Standard";
-    let quantity = 1;
+    const ADMIN_UID = "tPgPOqy3aPU4HeIAvWm6t64N3hG3";
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get('id');
+    const pid = new URLSearchParams(window.location.search).get('id');
+    let productData = null;
+    let selectedColor = "Default";
 
-    async function initPage() {
-        if (!productId) {
-            window.location.href = "index.html";
-            return;
+    window.checkUID = () => {
+        const user = auth.currentUser;
+        if(user) alert("Your UID: " + user.uid);
+        else alert("No user logged in.");
+    }
+
+    function checkAdminStatus() {
+        const user = auth.currentUser;
+        const panel = document.getElementById('adminControls');
+        if (user && user.uid === ADMIN_UID) {
+            panel.style.display = 'block';
         }
+    }
+
+    onAuthStateChanged(auth, checkAdminStatus);
+    setInterval(checkAdminStatus, 2000); 
+
+    async function fetchProduct() {
+        if (!pid) return window.location.href = 'index.html';
+        const snap = await getDoc(doc(db, "products", pid));
+        if (snap.exists()) {
+            productData = snap.data();
+            renderProduct();
+        }
+    }
+
+    function renderProduct() {
+        document.getElementById('pName').innerText = productData.name;
+        document.getElementById('pPrice').innerText = "₦" + Number(productData.price).toLocaleString();
+        document.getElementById('catLabel').innerText = productData.category || "COLLECTION";
+        document.getElementById('pDesc').innerText = productData.description || "";
         
-        try {
-            const docRef = doc(db, "products", productId);
-            const docSnap = await getDoc(docRef);
+        const isStock = productData.inStock !== false;
+        const badge = document.getElementById('stockBadge');
+        badge.innerText = isStock ? "In Stock" : "Out of Stock";
+        badge.className = `stock-status-badge ${isStock ? 'status-in' : 'status-out'}`;
+        document.getElementById('stockToggle').checked = isStock;
+        
+        if(!isStock) {
+            document.getElementById('atcBtn').disabled = true;
+            document.getElementById('atcBtn').innerText = "SOLD OUT";
+            document.getElementById('atcBtn').style.opacity = "0.5";
+        }
 
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                currentProduct = data;
+        const grid = document.getElementById('colorGrid');
+        grid.innerHTML = ""; 
 
-                document.getElementById('prodTitle').innerText = data.name;
-                document.getElementById('categoryLabel').innerText = data.category;
-                document.getElementById('prodDesc').innerText = data.description || "No description provided.";
-                document.getElementById('prodPrice').innerText = "₦" + Number(data.price).toLocaleString();
+        // RENDER THE ROUND SWATCHES
+        if (productData.colors && productData.colors.length > 0) {
+            document.getElementById('colorArea').style.display = 'block';
+            productData.colors.forEach((c, i) => {
+                const sw = document.createElement('div');
+                sw.className = `color-swatch ${i===0 ? 'active' : ''}`;
                 
-                document.getElementById('stockDisplay').innerText = data.stock > 0 ? `In Stock` : "Out of Stock";
-                if(data.stock <= 0) {
-                    document.getElementById('stockDisplay').style.color = "red";
-                    document.getElementById('stockDisplay').innerText = "Currently Out of Stock";
-                }
+                // Use the hex color saved from admin
+                sw.style.backgroundColor = c.hex || "#ddd";
+                sw.title = c.name;
 
-                const container = document.getElementById('colorContainer');
-                if (data.colors && data.colors.length > 0) {
-                    document.getElementById('colorSelectorSection').style.display = 'block';
-                    data.colors.forEach((c, index) => {
-                        const dot = document.createElement('div');
-                        dot.className = 'color-dot' + (index === 0 ? ' active' : '');
-                        dot.style.background = c.hex;
-                        dot.onclick = () => selectColor(c.img, c.name, dot);
-                        container.appendChild(dot);
-                    });
-                    selectColor(data.colors[0].img, data.colors[0].name, container.firstChild);
-                } else {
-                    const img = document.getElementById('displayImg');
-                    img.src = data.img || data.image || 'placeholder.jpg';
-                    img.onload = () => img.style.opacity = '1';
-                }
-                updateWhatsAppLink();
-            } else {
-                alert("Product not found.");
-                window.location.href = "index.html";
-            }
-        } catch (error) {
-            console.error("Error fetching product:", error);
+                sw.onclick = () => {
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                    sw.classList.add('active');
+                    selectedColor = c.name;
+                    updateWA();
+                };
+                grid.appendChild(sw);
+            });
+            selectedColor = productData.colors[0].name;
         }
+        
+        changeImage(productData.img || productData.image);
+        updateWA();
     }
 
-    window.selectColor = function(imgSrc, colorName, element) {
-        selectedColorName = colorName;
-        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
-        element.classList.add('active');
-
+    function changeImage(src) {
         const img = document.getElementById('displayImg');
-        img.style.opacity = '0';
+        if(!src) return;
+        img.style.opacity = "0";
         setTimeout(() => {
-            img.src = imgSrc;
-            img.onload = () => img.style.opacity = '1';
-            updateWhatsAppLink();
-        }, 250);
+            img.src = src;
+            img.style.opacity = "1";
+        }, 200);
     }
 
-    window.updateQty = function(val) {
-        quantity = Math.max(1, quantity + val);
-        document.getElementById('qtyValue').innerText = quantity;
-        updateWhatsAppLink();
+    window.handleStockUpdate = async (val) => {
+        try {
+            await updateDoc(doc(db, "products", pid), { inStock: val });
+            location.reload();
+        } catch(e) { alert("Error: " + e.message); }
+    };
+
+    window.handleDelete = async () => {
+        if(confirm("Confirm deletion?")) {
+            await deleteDoc(doc(db, "products", pid));
+            window.location.href = "index.html";
+        }
+    };
+
+    function updateWA() {
+        const text = `Hello Mummy J Emporium, I'm interested in:\n\n*Product:* ${productData.name}\n*Color:* ${selectedColor}\n*Price:* ₦${Number(productData.price).toLocaleString()}`;
+        document.getElementById('waBtn').href = `https://wa.me/2348123541592?text=${encodeURIComponent(text)}`;
     }
 
-    function updateWhatsAppLink() {
-        if (!currentProduct) return;
-        const colorText = selectedColorName !== "Standard" ? `\n*Color:* ${selectedColorName}` : "";
-        const msg = `Hello Mummy J Emporium, I'd like to order:\n\n*Product:* ${currentProduct.name}${colorText}\n*Qty:* ${quantity}\n*Price:* ${document.getElementById('prodPrice').innerText}\n\nIs this available?`;
-        document.getElementById('whatsappLink').href = `https://wa.me/2348123541592?text=${encodeURIComponent(msg)}`;
-    }
-
-    window.handleAddToCart = function() {
-        if (!currentProduct) return;
+    window.addToCart = () => {
         let cart = JSON.parse(localStorage.getItem('mj_cart')) || [];
-        
-        const cartItem = {
-            id: productId,
-            name: currentProduct.name,
-            price: currentProduct.price,
-            color: selectedColorName,
-            image: document.getElementById('displayImg').src,
-            qty: quantity
-        };
-
-        cart.push(cartItem);
+        cart.push({ 
+            id: pid, 
+            name: productData.name, 
+            price: productData.price, 
+            color: selectedColor, 
+            img: document.getElementById('displayImg').src 
+        });
         localStorage.setItem('mj_cart', JSON.stringify(cart));
-        
-        alert(`${quantity}x ${currentProduct.name} added to cart!`);
-        window.location.href = "cart.html";
-    }
+        alert("Added to cart!");
+    };
 
-    initPage();
+    fetchProduct();
 </script>
 
 </body>

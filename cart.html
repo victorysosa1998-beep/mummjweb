@@ -104,8 +104,7 @@
     <div class="container">
         <h1>MY CART</h1>
         
-        <div id="cartContent">
-            </div>
+        <div id="cartContent"></div>
         
         <div class="cart-summary">
             <p style="color: #666; font-size: 14px; font-weight: 600;">ESTIMATED TOTAL</p>
@@ -139,14 +138,16 @@
             checkoutBtn.classList.remove('disabled');
 
             cart.forEach((item, index) => {
-                const itemPrice = parseFloat(item.price) || 0;
+                // Ensure price is a clean number for calculation
+                const cleanPriceStr = String(item.price).replace(/[^0-9.]/g, '');
+                const itemPrice = parseFloat(cleanPriceStr) || 0;
                 const itemQty = parseInt(item.qty) || 1;
                 const itemTotal = itemPrice * itemQty;
                 total += itemTotal;
 
                 container.innerHTML += `
                     <div class="cart-item">
-                        <img src="${item.image}" alt="${item.name}">
+                        <img src="${item.img || item.image}" alt="${item.name}">
                         <div class="item-details">
                             <h3>${item.name}</h3>
                             <p>Variant: <b>${item.color || 'Standard'}</b></p>
@@ -173,10 +174,7 @@
             if (cart[index]) {
                 let currentQty = parseInt(cart[index].qty) || 1;
                 let newQty = currentQty + delta;
-                
-                // Keep quantity between 1 and 99
                 cart[index].qty = Math.max(1, Math.min(99, newQty));
-                
                 localStorage.setItem('mj_cart', JSON.stringify(cart));
                 renderCart();
             }
@@ -189,7 +187,6 @@
             renderCart();
         }
 
-        // Initial Load
         document.addEventListener('DOMContentLoaded', renderCart);
     </script>
 </body>

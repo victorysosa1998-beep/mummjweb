@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Secure Checkout - Mummy J</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f9f9f9; padding: 40px 5%; color: #12256B; }
+        .payment-card { background: white; max-width: 500px; margin: auto; padding: 40px; border-radius: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); }
+        h1 { font-family: 'Anton'; font-size: 32px; margin-bottom: 20px; text-transform: uppercase; }
+        .account-box { background: #F2F2F2; padding: 25px; border-radius: 20px; margin: 25px 0; border-left: 5px solid #446CFF; position: relative; }
+        .account-box p { margin: 5px 0; font-weight: 700; }
+        .label { font-size: 11px; color: #666; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; }
+        .total-banner { font-size: 26px; font-weight: 800; border-bottom: 2px solid #eee; padding-bottom: 15px; display: flex; justify-content: space-between; }
+        .btn-confirm { background: #25d366; color: white; display: block; text-align: center; padding: 22px; border-radius: 18px; text-decoration: none; font-weight: 800; margin-top: 30px; cursor: pointer; border: none; width: 100%; font-size: 16px; transition: 0.3s; }
+        .btn-confirm:hover { transform: scale(1.02); background: #20ba5a; }
+        .instruction { font-size: 14px; color: #555; line-height: 1.6; }
+        .copy-tag { position: absolute; right: 20px; top: 45px; font-size: 10px; background: #446CFF; color: white; padding: 4px 8px; border-radius: 5px; cursor: pointer; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<div class="payment-card">
+    <h1>Complete Order</h1>
+    <div class="total-banner">
+        <span style="font-size: 14px; font-weight: 400; color: #666;">Amount Due:</span>
+        <span id="finalTotal">₦0</span>
+    </div>
+    
+    <p class="instruction" style="margin-top: 20px;">Transfer the total amount to the account below. Once done, click the <b>Payment Made</b> button to notify the admin.</p>
+
+    <div class="account-box">
+        <span class="label">Bank Name</span>
+        <p>GT BANK</p>
+        <br>
+        <span class="label">Account Number</span>
+        <p id="accNum" style="font-size: 24px; letter-spacing: 1px;">0123456789</p>
+        <a href="javascript:void(0)" class="copy-tag" onclick="copyAcc()">COPY</a>
+        <br>
+        <span class="label">Account Name</span>
+        <p>MUMMY J EMPORIUM</p>
+    </div>
+
+    <button id="payMadeBtn" class="btn-confirm">✅ I HAVE MADE PAYMENT</button>
+</div>
+
+<script>
+    const cart = JSON.parse(localStorage.getItem('mj_cart')) || [];
+    const waNumber = "2348123541592"; 
+    let total = 0;
+
+    let receiptID = "MJ-" + Math.floor(1000 + Math.random() * 9000);
+    let textSummary = `*ORDER RECEIPT: ${receiptID}*\n`;
+    textSummary += `━━━━━━━━━━━━━━━━━━━━\n`;
+    textSummary += `*MUMMY J EMPORIUM*\n`;
+    textSummary += `Date: ${new Date().toLocaleDateString()}\n`;
+    textSummary += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+    cart.forEach(item => {
+        // Clean the price string to ensure valid math
+        const cleanPriceStr = String(item.price).replace(/[^0-9.]/g, '');
+        const itemPrice = parseFloat(cleanPriceStr) || 0;
+        const itemQty = parseInt(item.qty) || 1;
+        
+        let subtotal = itemPrice * itemQty;
+        total += subtotal;
+        
+        textSummary += `🔹 *${item.name}*\n`;
+        textSummary += `   Color: ${item.color || 'Standard'} | Qty: ${itemQty}\n`;
+        textSummary += `   Price: ₦${subtotal.toLocaleString()}\n\n`;
+    });
+
+    textSummary += `━━━━━━━━━━━━━━━━━━━━\n`;
+    textSummary += `*TOTAL PAID: ₦${total.toLocaleString()}*\n`;
+    textSummary += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+    textSummary += `✅ _I have successfully transferred the funds._\n`;
+    textSummary += `_Please verify and process my order._`;
+
+    document.getElementById('finalTotal').innerText = `₦${total.toLocaleString()}`;
+
+    document.getElementById('payMadeBtn').addEventListener('click', function() {
+        if(total === 0) {
+            alert("No items in cart to process.");
+            return;
+        }
+        localStorage.removeItem('mj_cart');
+        window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(textSummary)}`;
+    });
+
+    function copyAcc() {
+        const num = document.getElementById('accNum').innerText;
+        navigator.clipboard.writeText(num);
+        alert("Account number copied!");
+    }
+</script>
+
+</body>
+</html>
