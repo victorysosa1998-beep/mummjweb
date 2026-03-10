@@ -27,6 +27,17 @@
             transition: transform 0.2s ease;
         }
         .cart-item:hover { transform: translateY(-2px); }
+        
+        /* NEW: Link styling for the product clickable area */
+        .item-link {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            text-decoration: none;
+            color: inherit;
+            flex: 1;
+        }
+
         .cart-item img { width: 100px; height: 100px; object-fit: contain; border-radius: 12px; background: #f2f2f2; }
         .item-details { flex: 1; }
         .item-details h3 { font-size: 18px; margin-bottom: 5px; text-transform: uppercase; }
@@ -94,6 +105,7 @@
 
         @media (max-width: 600px) {
             .cart-item { flex-direction: column; text-align: center; }
+            .item-link { flex-direction: column; }
             .qty-controls { justify-content: center; }
             .item-price-info { text-align: center !important; margin-top: 10px; }
         }
@@ -138,7 +150,6 @@
             checkoutBtn.classList.remove('disabled');
 
             cart.forEach((item, index) => {
-                // Ensure price is a clean number for calculation
                 const cleanPriceStr = String(item.price).replace(/[^0-9.]/g, '');
                 const itemPrice = parseFloat(cleanPriceStr) || 0;
                 const itemQty = parseInt(item.qty) || 1;
@@ -147,17 +158,23 @@
 
                 container.innerHTML += `
                     <div class="cart-item">
-                        <img src="${item.img || item.image}" alt="${item.name}">
-                        <div class="item-details">
-                            <h3>${item.name}</h3>
-                            <p>Variant: <b>${item.color || 'Standard'}</b></p>
-                            <div class="qty-controls">
+                        <a href="product-details.html?id=${item.id}" class="item-link">
+                            <img src="${item.img || item.image}" alt="${item.name}">
+                            <div class="item-details">
+                                <h3>${item.name}</h3>
+                                <p>Variant: <b>${item.color || 'Standard'}</b></p>
+                            </div>
+                        </a>
+
+                        <div class="controls-wrapper">
+                             <div class="qty-controls">
                                 <button type="button" class="qty-btn" onclick="changeQty(${index}, -1)">-</button>
                                 <span class="qty-val">${itemQty}</span>
                                 <button type="button" class="qty-btn" onclick="changeQty(${index}, 1)">+</button>
                             </div>
                             <button type="button" class="remove-btn" onclick="removeItem(${index})">Remove Item</button>
                         </div>
+
                         <div class="item-price-info" style="text-align: right">
                             <p style="font-weight:800; font-size: 20px; color: var(--navy);">₦${itemTotal.toLocaleString()}</p>
                             <p style="font-size: 12px; color: #999;">₦${itemPrice.toLocaleString()} each</p>

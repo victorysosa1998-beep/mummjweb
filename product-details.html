@@ -1,131 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Product Details - Mummy J Emporium</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - Mummy J Emporium</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;800&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;800&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
 
-<style>
-:root {
-    --navy: #12256B;
-    --blue: #446CFF;
-    --pale-blue: #A9C0FF;
-    --bg-card: #F2F2F2;
-    --danger: #ff3b30;
-    --success: #28a745;
-}
+    <style>
+        :root {
+            --navy: #12256B;
+            --blue: #446CFF;
+            --pale-blue: #A9C0FF;
+            --bg-card: #F2F2F2;
+            --danger: #ff3b30;
+            --success: #28a745;
+        }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', sans-serif; color: var(--navy); background-color: #fff; padding-top: 100px; }
-.container { max-width: 1300px; margin: 0 auto; padding: 0 5%; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; color: var(--navy); background-color: #fff; padding-top: 100px; }
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 5%; }
 
-/* --- NAVBAR --- */
-.navbar { 
-    position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
-    background: white; display: flex; justify-content: space-between; 
-    align-items: center; padding: 15px 5%; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-.logo-img { height: 55px; width: auto; cursor: pointer; }
+        /* --- NAVBAR --- */
+        .navbar { 
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            background: white; display: flex; justify-content: space-between; 
+            align-items: center; padding: 15px 5%; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .logo-img { height: 55px; width: auto; cursor: pointer; }
 
-/* --- PRODUCT PAGE LAYOUT --- */
-.product-wrapper {
-    display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 60px;
-    padding: 40px 0;
-}
+        /* --- PRODUCT PAGE LAYOUT --- */
+        .product-wrapper {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 60px;
+            padding: 40px 0;
+        }
 
-.main-img-container {
-    background: var(--bg-card);
-    border-radius: 35px;
-    padding: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 500px;
-    position: relative;
-}
+        .main-img-container {
+            background: var(--bg-card);
+            border-radius: 35px;
+            padding: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 500px;
+            position: relative;
+        }
 
-#displayImg {
-    width: 100%;
-    max-height: 500px;
-    object-fit: contain;
-    transition: 0.3s;
-}
+        #displayImg {
+            width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            transition: 0.3s;
+            opacity: 0; 
+        }
 
-.product-info { position: sticky; top: 140px; height: fit-content; }
-.brand-label { color: var(--blue); font-weight: 700; letter-spacing: 2px; font-size: 12px; margin-bottom: 10px; display: block; }
-.product-title { font-family: 'Anton', sans-serif; font-size: 48px; line-height: 1.1; margin-bottom: 15px; }
-.product-price { font-size: 32px; font-weight: 800; color: var(--navy); margin-bottom: 20px; }
+        .product-info { position: sticky; top: 140px; height: fit-content; }
+        .brand-label { color: var(--blue); font-weight: 700; letter-spacing: 2px; font-size: 12px; margin-bottom: 10px; display: block; }
+        .product-title { font-family: 'Anton', sans-serif; font-size: 48px; line-height: 1.1; margin-bottom: 15px; }
+        .product-price { font-size: 32px; font-weight: 800; color: var(--navy); margin-bottom: 20px; }
 
-/* DESCRIPTION STYLE */
-.product-description {
-    font-size: 15px;
-    line-height: 1.6;
-    color: #555;
-    margin-bottom: 25px;
-    white-space: pre-line;
-}
+        .product-description {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 25px;
+            white-space: pre-line;
+        }
 
-/* STOCK STATUS INDICATOR */
-.stock-status-badge {
-    display: inline-block;
-    padding: 6px 15px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 800;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-}
-.status-in { background: #e8f5e9; color: var(--success); }
-.status-out { background: #ffebee; color: var(--danger); }
+        .stock-status-badge {
+            display: inline-block;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .status-in { background: #e8f5e9; color: var(--success); }
+        .status-out { background: #ffebee; color: var(--danger); }
 
-/* --- THE COLOR CIRCLES SECTION --- */
-.color-section { margin: 25px 0; }
-.selector-label { font-weight: 700; font-size: 13px; color: #888; margin-bottom: 15px; display: block; letter-spacing: 1px; }
-.color-grid { display: flex; gap: 15px; flex-wrap: wrap; }
-.color-swatch {
-    width: 35px; 
-    height: 35px; 
-    border-radius: 50%; /* This makes it a circle */
-    border: 2px solid #ddd; 
-    cursor: pointer; 
-    transition: 0.3s;
-    position: relative;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-.color-swatch.active { 
-    border-color: var(--blue); 
-    transform: scale(1.2); 
-    box-shadow: 0 0 10px rgba(68, 108, 255, 0.4);
-}
+        .color-section { margin: 25px 0; }
+        .selector-label { font-weight: 700; font-size: 13px; color: #888; margin-bottom: 15px; display: block; letter-spacing: 1px; }
+        .color-grid { display: flex; gap: 15px; flex-wrap: wrap; }
+        .color-swatch {
+            width: 35px; 
+            height: 35px; 
+            border-radius: 50%; 
+            border: 2px solid #ddd; 
+            cursor: pointer; 
+            transition: 0.3s;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .color-swatch.active { 
+            border-color: var(--blue); 
+            transform: scale(1.2); 
+            box-shadow: 0 0 10px rgba(68, 108, 255, 0.4);
+        }
 
-.buy-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 30px; }
-.btn-atc { background: var(--navy); color: white; border: none; padding: 20px; border-radius: 15px; font-weight: 700; cursor: pointer; }
-.btn-whatsapp { background: #25d366; color: white; text-align: center; padding: 20px; border-radius: 15px; text-decoration: none; font-weight: 700; }
+        .buy-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 30px; }
+        .btn-atc { background: var(--navy); color: white; border: none; padding: 20px; border-radius: 15px; font-weight: 700; cursor: pointer; }
+        .btn-whatsapp { background: #25d366; color: white; text-align: center; padding: 20px; border-radius: 15px; text-decoration: none; font-weight: 700; }
 
-/* ADMIN PANEL */
-#adminControls {
-    margin-top: 40px; padding: 25px; background: #fff; 
-    border: 3px solid #000; border-radius: 25px; display: none; 
-}
-.admin-header { font-size: 14px; font-weight: 900; color: #000; margin-bottom: 15px; display: block; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; margin-bottom: 15px; }
-.btn-del { width: 100%; background: #fff; color: var(--danger); border: 1px solid var(--danger); padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        #adminControls {
+            margin-top: 40px; padding: 25px; background: #fff; 
+            border: 3px solid #000; border-radius: 25px; display: none; 
+        }
+        .admin-header { font-size: 14px; font-weight: 900; color: #000; margin-bottom: 15px; display: block; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; margin-bottom: 15px; }
+        .btn-del { width: 100%; background: #fff; color: var(--danger); border: 1px solid var(--danger); padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
-/* TOGGLE SWITCH */
-.switch { position: relative; display: inline-block; width: 50px; height: 26px; }
-.switch input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-input:checked + .slider { background-color: var(--success); }
-input:checked + .slider:before { transform: translateX(24px); }
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--success); }
+        input:checked + .slider:before { transform: translateX(24px); }
 
-.debug-btn { position: fixed; bottom: 10px; left: 10px; font-size: 10px; opacity: 0.3; background: #000; color: #fff; border: none; padding: 5px; cursor: pointer; }
-</style>
+        .debug-btn { position: fixed; bottom: 10px; left: 10px; font-size: 10px; opacity: 0.3; background: #000; color: #fff; border: none; padding: 5px; cursor: pointer; }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 992px) {
+            body { padding-top: 80px; }
+            .product-wrapper {
+                grid-template-columns: 1fr; /* Stack elements vertically */
+                gap: 30px;
+                padding: 20px 0;
+            }
+            .main-img-container {
+                min-height: 350px;
+                padding: 30px;
+                border-radius: 25px;
+            }
+            #displayImg {
+                max-height: 350px;
+            }
+            .product-info {
+                position: static; /* Remove sticky on mobile */
+            }
+            .product-title {
+                font-size: 36px;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -194,7 +214,6 @@ input:checked + .slider:before { transform: translateX(24px); }
     const auth = getAuth(app);
 
     const ADMIN_UID = "tPgPOqy3aPU4HeIAvWm6t64N3hG3";
-
     const pid = new URLSearchParams(window.location.search).get('id');
     let productData = null;
     let selectedColor = "Default";
@@ -203,25 +222,30 @@ input:checked + .slider:before { transform: translateX(24px); }
         const user = auth.currentUser;
         if(user) alert("Your UID: " + user.uid);
         else alert("No user logged in.");
-    }
+    };
 
     function checkAdminStatus() {
         const user = auth.currentUser;
         const panel = document.getElementById('adminControls');
-        if (user && user.uid === ADMIN_UID) {
+        if (panel && user && user.uid === ADMIN_UID) {
             panel.style.display = 'block';
         }
     }
 
     onAuthStateChanged(auth, checkAdminStatus);
-    setInterval(checkAdminStatus, 2000); 
 
     async function fetchProduct() {
         if (!pid) return window.location.href = 'index.html';
-        const snap = await getDoc(doc(db, "products", pid));
-        if (snap.exists()) {
-            productData = snap.data();
-            renderProduct();
+        try {
+            const snap = await getDoc(doc(db, "products", pid));
+            if (snap.exists()) {
+                productData = snap.data();
+                renderProduct();
+            } else {
+                alert("Product not found.");
+            }
+        } catch (error) {
+            console.error("Error fetching product:", error);
         }
     }
 
@@ -238,22 +262,20 @@ input:checked + .slider:before { transform: translateX(24px); }
         document.getElementById('stockToggle').checked = isStock;
         
         if(!isStock) {
-            document.getElementById('atcBtn').disabled = true;
-            document.getElementById('atcBtn').innerText = "SOLD OUT";
-            document.getElementById('atcBtn').style.opacity = "0.5";
+            const atc = document.getElementById('atcBtn');
+            atc.disabled = true;
+            atc.innerText = "SOLD OUT";
+            atc.style.opacity = "0.5";
         }
 
         const grid = document.getElementById('colorGrid');
         grid.innerHTML = ""; 
 
-        // RENDER THE ROUND SWATCHES
         if (productData.colors && productData.colors.length > 0) {
             document.getElementById('colorArea').style.display = 'block';
             productData.colors.forEach((c, i) => {
                 const sw = document.createElement('div');
                 sw.className = `color-swatch ${i===0 ? 'active' : ''}`;
-                
-                // Use the hex color saved from admin
                 sw.style.backgroundColor = c.hex || "#ddd";
                 sw.title = c.name;
 
@@ -274,7 +296,10 @@ input:checked + .slider:before { transform: translateX(24px); }
 
     function changeImage(src) {
         const img = document.getElementById('displayImg');
-        if(!src) return;
+        if(!src) {
+            img.style.opacity = "1";
+            return;
+        }
         img.style.opacity = "0";
         setTimeout(() => {
             img.src = src;
@@ -302,6 +327,7 @@ input:checked + .slider:before { transform: translateX(24px); }
     }
 
     window.addToCart = () => {
+        if(!productData) return;
         let cart = JSON.parse(localStorage.getItem('mj_cart')) || [];
         cart.push({ 
             id: pid, 

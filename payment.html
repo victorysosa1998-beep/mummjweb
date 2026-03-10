@@ -112,11 +112,11 @@
             localStorage.removeItem('mj_cart');
             
             // Open WhatsApp
-            window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(textSummary)}`;
+            window.location.href = `https://wa.me/${w}?text=${encodeURIComponent(textSummary)}`;
         } catch (e) {
             console.error("Error logging order: ", e);
             // Fallback: Still allow WhatsApp even if database fails
-            window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(textSummary)}`;
+            window.location.href = `https://wa.me/${+2348123541592}?text=${encodeURIComponent(textSummary)}`;
         }
     });
 
