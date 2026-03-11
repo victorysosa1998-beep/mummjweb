@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order History - Mummy J Emporium</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --navy: #12256B;
+    --blue: #446CFF;
+    --bg-card: #F2F2F2;
+    --red: #FF4444;
+    --green: #28a745;
+    --yellow: #FFD700;
+}
+body { font-family: 'Inter', sans-serif; color: var(--navy); background-color: #fff; padding: 40px 5%; }
+.container { max-width: 800px; margin: 0 auto; }
+.back-link { text-decoration: none; color: var(--blue); font-weight: 600; margin-bottom: 20px; display: inline-block; }
+
+.order-filter-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.order-filter-bar input { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #ddd; outline: none; }
+
+.sales-summary { 
+    background: var(--bg-card); padding: 20px; border-radius: 15px; 
+    margin-bottom: 25px; text-align: center; border-bottom: 4px solid var(--blue);
+}
+.sales-summary h3 { font-size: 28px; color: var(--blue); margin-top: 5px; }
+
+.order-item-card { 
+    background: #f9f9f9; 
+    border-radius: 15px; 
+    padding: 20px; 
+    margin-bottom: 15px; 
+    border-left: 5px solid var(--blue); 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+    cursor: pointer;
+    transition: 0.2s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+.order-item-card:hover { transform: scale(1.01); background: #f2f2f2; }
+.order-header { display: flex; justify-content: space-between; font-weight: 800; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; }
+.order-details-list { font-size: 14px; color: #555; }
+.order-details-list div { margin-bottom: 6px; }
+
+.status-tag { 
+    font-size: 11px; 
+    text-transform: uppercase; 
+    font-weight: 800; 
+    padding: 4px 8px; 
+    border-radius: 5px; 
+    background: #eee;
+    color: var(--navy);
+}
+
+/* Status specific colors */
+.status-delivered {
+    background-color: var(--green) !important;
+    color: white !important;
+}
+
+.status-sentout {
+    background-color: var(--yellow) !important;
+    color: var(--navy) !important; /* Navy for better contrast on yellow */
+}
+
+.status-confirmed {
+    background-color: var(--blue) !important;
+    color: white !important;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.delete-btn {
+    background: #ffebeb;
+    color: var(--red);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 11px;
+    transition: 0.3s;
+    letter-spacing: 0.5px;
+}
+.delete-btn:hover { background: var(--red); color: white; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <a href="index.html" class="back-link">← Back to Store</a>
+    <h2 style="font-family:'Playfair Display'; margin-bottom: 20px; font-size: 32px;">Order History</h2>
+
+    <div class="sales-summary">
+        <p>Total Filtered Sales</p>
+        <h3 id="filteredSalesTotal">₦0</h3>
+    </div>
+
+    <div class="order-filter-bar">
+        <input type="date" id="orderDateFilter">
+        <input type="text" id="orderSearch" placeholder="Search Order ID or Name...">
+    </div>
+
+    <div id="ordersListContainer">
+        <p style="text-align:center; color:#999;">Loading orders...</p>
+    </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, getDocs, query, orderBy, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBlGgRRrPP67b7EHyYm_eL1R08zFi08aLg",
+    authDomain: "mummy-jweb.firebaseapp.com",
+    projectId: "mummy-jweb",
+    storageBucket: "mummy-jweb.firebasestorage.app",
+    messagingSenderId: "924167105238",
+    appId: "1:924167105238:web:56261faee1ca1ee9d7b777",
+    measurementId: "G-YMNFG7RV4"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+  const ADMIN_UID = "tPgPOqy3aPU4HeIAvWm6t64N3hG3";
+  let ALL_ORDERS = [];
+
+  onAuthStateChanged(auth, (user) => {
+      if (!user || user.uid !== ADMIN_UID) {
+          window.location.href = "login.html";
+      } else {
+          fetchOrders();
+      }
+  });
+
+  async function fetchOrders() {
+      try {
+          const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+          const snap = await getDocs(q);
+          ALL_ORDERS = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          renderOrders();
+      } catch (e) {
+          console.error(e);
+          document.getElementById('ordersListContainer').innerHTML = "Error loading orders.";
+      }
+  }
+
+  window.deleteOrder = async (event, docId) => {
+      event.stopPropagation(); 
+      if (confirm("Are you sure you want to PERMANENTLY delete this order?")) {
+          try {
+              await deleteDoc(doc(db, "orders", docId));
+              ALL_ORDERS = ALL_ORDERS.filter(o => o.id !== docId);
+              renderOrders();
+          } catch (e) {
+              alert("Error: " + e.message);
+          }
+      }
+  };
+
+  function renderOrders() {
+      const dateVal = document.getElementById('orderDateFilter').value;
+      const searchVal = document.getElementById('orderSearch').value.toLowerCase();
+      const container = document.getElementById('ordersListContainer');
+      
+      let filtered = ALL_ORDERS.filter(o => {
+          const orderID = (o.orderID || "").toLowerCase();
+          const custName = (o.customerName || "").toLowerCase();
+          const matchesSearch = orderID.includes(searchVal) || custName.includes(searchVal);
+          let matchesDate = true;
+          if(dateVal && o.createdAt) {
+              const orderDate = o.createdAt.toDate().toISOString().split('T')[0];
+              matchesDate = orderDate === dateVal;
+          }
+          return matchesSearch && matchesDate;
+      });
+
+      let totalSales = 0;
+      container.innerHTML = filtered.map(o => {
+          totalSales += (o.totalAmount || 0);
+          const dateStr = o.createdAt ? o.createdAt.toDate().toLocaleString() : "N/A";
+          
+          // Determine status classes
+          let extraClass = "";
+          if (o.status === "Delivered") extraClass = "status-delivered";
+          else if (o.status === "Sent Out") extraClass = "status-sentout";
+          else if (o.status === "Confirmed") extraClass = "status-confirmed";
+
+          return `
+              <div class="order-item-card" onclick="window.location.href='order-details.html?id=${o.id}'">
+                  <div class="order-header">
+                      <span>ID: ${o.orderID || 'N/A'}</span>
+                      <span style="color: var(--blue);">₦${Number(o.totalAmount).toLocaleString()}</span>
+                  </div>
+                  <div class="order-details-list">
+                      <div style="font-weight:800; font-size: 16px;">${o.customerName || 'No Name'}</div>
+                      <div style="font-weight:600; color:#888;">${dateStr}</div>
+                  </div>
+                  <div class="card-footer">
+                      <span class="status-tag ${extraClass}">${o.status || 'Pending'}</span>
+                      <button class="delete-btn" onclick="deleteOrder(event, '${o.id}')">DELETE ORDER</button>
+                  </div>
+              </div>
+          `;
+      }).join('');
+
+      if(filtered.length === 0) container.innerHTML = "<p style='text-align:center; color:#999;'>No orders found.</p>";
+      document.getElementById('filteredSalesTotal').innerText = `₦${totalSales.toLocaleString()}`;
+  }
+
+  document.getElementById('orderDateFilter').addEventListener('change', renderOrders);
+  document.getElementById('orderSearch').addEventListener('keyup', renderOrders);
+</script>
+</body>
+</html>

@@ -67,6 +67,28 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
     display: none; align-items: center; justify-content: center; border: 2px solid white;
 }
 
+/* --- ADMIN STATS BAR --- */
+.admin-stats-bar {
+    display: none;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+    animation: revealUp 0.8s ease forwards;
+}
+.stat-card {
+    background: var(--bg-card);
+    padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--navy);
+    transition: 0.3s;
+    border: 1px solid transparent;
+}
+.stat-card:hover { border-color: var(--blue); transform: translateY(-5px); }
+.stat-card h4 { font-size: 14px; opacity: 0.7; margin-bottom: 5px; }
+.stat-card p { font-size: 24px; font-weight: 800; color: var(--blue); }
+
 /* --- MOBILE DRAWER --- */
 .menu-toggle { display: block; font-size: 24px; cursor: pointer; }
 @media (min-width: 769px) { .menu-toggle { display: none; } }
@@ -121,8 +143,20 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
     background: var(--bg-card); border-radius: 35px; padding: 40px;
     margin-right: 20px; display: flex; flex-direction: column; align-items: center; position: relative;
     animation-delay: 0.5s;
+    overflow: hidden;
 }
-.product-img { width: 100%; height: auto; object-fit: contain; animation: bagJog 2s ease-in-out infinite; }
+.product-img { 
+    width: 100%; 
+    height: auto; 
+    object-fit: contain; 
+    animation: bagJog 3s ease-in-out infinite; 
+}
+
+@keyframes bagJog {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(2deg); }
+}
+
 .action-footer { display: flex; gap: 15px; width: 100%; margin-top: 20px; align-items: center; text-decoration: none; }
 .label-badge { background: var(--pale-blue); flex: 1; border-radius: 30px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 18px; padding: 15px; text-transform: uppercase; }
 .arrow-circle { width: 60px; height: 60px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--navy); }
@@ -155,8 +189,11 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
     font-weight: 800; font-size: 12px; white-space: nowrap; z-index: 4;
 }
 
-.fav-btn { position: absolute; top: 15px; right: 15px; background: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; z-index: 5; transition: 0.3s; }
+.fav-btn { position: absolute; top: 15px; right: 15px; background: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; z-index: 5; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 .fav-btn.active svg { fill: #ff3b30; stroke: #ff3b30; }
+
+.quick-add-btn { position: absolute; top: 15px; left: 15px; background: var(--blue); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; z-index: 5; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.quick-add-btn:hover { transform: scale(1.1); background: var(--navy); }
 
 .card h3 { margin-top: 15px; font-size: 16px; font-weight: 700; }
 .price { font-size: 15px; color: var(--blue); font-weight: 800; margin-top: 5px; }
@@ -293,41 +330,11 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
     border: 2px solid white;
 }
 
-/* --- DASHBOARD STYLES --- */
-.dashboard-modal {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8); z-index: 3000; display: none;
-    align-items: center; justify-content: center;
-}
-.dashboard-content {
-    background: white; padding: 40px; border-radius: 25px; width: 95%; max-width: 600px;
-    position: relative; text-align: center; max-height: 90vh; overflow-y: auto;
-}
-.stat-box {
-    background: var(--bg-card); padding: 20px; border-radius: 15px; margin: 10px 0;
-}
-.stat-box h3 { font-size: 32px; color: var(--blue); margin-top: 5px; }
-
-/* ORDER HISTORY SPECIFIC STYLES */
-.clickable-stat { cursor: pointer; transition: 0.3s; border: 1px solid transparent; }
-.clickable-stat:hover { border-color: var(--blue); transform: scale(1.02); }
-
-.order-history-view { display: none; text-align: left; }
-.order-filter-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-.order-filter-bar input { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #ddd; }
-
-.order-item-card { background: #f9f9f9; border-radius: 15px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--blue); }
-.order-header { display: flex; justify-content: space-between; font-weight: 800; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px; }
-.order-details-list { font-size: 14px; color: #555; }
-.order-details-list div { margin-bottom: 4px; }
-
 @keyframes breathe {
     0% { transform: scale(1); box-shadow: 0 0 0 0px rgba(37, 211, 102, 0.5); }
     50% { transform: scale(1.08); box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
     100% { transform: scale(1); box-shadow: 0 0 0 0px rgba(37, 211, 102, 0); }
 }
-
-@keyframes bagJog { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 
 @media (max-width: 992px) {
     .footer-grid { grid-template-columns: 1fr 1fr; }
@@ -354,48 +361,10 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
     <a class="drawer-link" onclick="handleDrawerFilter('Handbags')">Handbags</a>
     <a class="drawer-link" onclick="handleDrawerFilter('Wallets')">Wallets</a>
     <a class="drawer-link" onclick="handleDrawerFilter('Accessories')">Accessories</a>
-    <a href="javascript:void(0)" id="dashboardLink" class="drawer-link" style="display: none;" onclick="openDashboard()">Store Dashboard</a>
+    <a href="orders.html" id="dashboardLink" class="drawer-link" style="display: none;">Store Dashboard</a>
     <a href="upload.html" id="uploadLink" class="drawer-link" style="display: none;" onclick="toggleDrawer()">Upload Products</a>
-    <a href="login.html" id="loginLink" class="drawer-link drawer-admin" onclick="toggleDrawer()">Admin Login</a>
+    <a href="login.html" id="loginLink" class="drawer-link drawer-admin" onclick="toggleDrawer()">Login</a>
     <a href="#" id="logoutBtn" class="drawer-link drawer-admin" style="display: none;" onclick="handleLogout()">Logout</a>
-</div>
-
-<div id="adminDashboard" class="dashboard-modal">
-    <div class="dashboard-content">
-        <button onclick="closeDashboard()" style="position:absolute; top:15px; right:15px; border:none; background:none; font-size:24px; cursor:pointer;">&times;</button>
-        
-        <div id="mainStatsView">
-            <h2 style="font-family:'Playfair Display'; margin-bottom:20px;">Store Analytics</h2>
-            <div class="stat-box">
-                <p>Total Visitors</p>
-                <h3 id="statVisitors">...</h3>
-            </div>
-            <div class="stat-box clickable-stat" onclick="showOrderHistory()">
-                <p>Successful Orders (Click to View)</p>
-                <h3 id="statOrders">...</h3>
-            </div>
-            <button onclick="closeDashboard()" style="width:100%; margin-top:20px; background:var(--navy); color:white; padding:12px; border:none; border-radius:10px; cursor:pointer;">Close</button>
-        </div>
-
-        <div id="orderHistoryView" class="order-history-view">
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
-                <button onclick="backToStats()" style="border:none; background:#eee; padding:8px 12px; border-radius:8px; cursor:pointer;">← Back</button>
-                <h2 style="font-family:'Playfair Display';">Order History</h2>
-            </div>
-
-            <div class="order-filter-bar">
-                <input type="date" id="orderDateFilter" onchange="filterOrders()">
-                <input type="text" id="orderSearch" placeholder="Search Order ID..." onkeyup="filterOrders()">
-            </div>
-
-            <div style="margin-bottom:15px; font-weight:700; color:var(--blue);">
-                Total Filtered Sales: <span id="filteredSalesTotal">₦0</span>
-            </div>
-
-            <div id="ordersListContainer">
-                </div>
-        </div>
-    </div>
 </div>
 
 <header class="navbar animate">
@@ -424,6 +393,17 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
 </header>
 
 <main class="container">
+    <div id="adminStats" class="admin-stats-bar">
+        <a href="orders.html" class="stat-card">
+            <h4>Total Orders</h4>
+            <p id="totalOrders">0</p>
+        </a>
+        <div class="stat-card">
+            <h4>Site Visitors</h4>
+            <p id="visitorCount">0</p>
+        </div>
+    </div>
+
     <section class="main-grid">
         <div class="text-block animate">
             <video autoplay muted loop playsinline class="video-background">
@@ -435,7 +415,7 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
         </div>
 
         <div class="bag-bg animate">
-            <img src="https://eu.louisvuitton.com/images/is/image/lv/1/PP_VP_L/louis-vuitton-hobo-metis--M27937_PM2_Front%20view.png?wid=1090&hei=1090" alt="Luxury Bag" class="product-img">
+            <img src="https://image2url.com/r2/default/images/1773237656775-ddc8efaf-ef07-44a1-9089-76538764820e.png" alt="Luxury Bag" class="product-img">
             <a href="#collection" class="action-footer">
                 <div class="label-badge">NEW COLLECTION</div>
                 <div class="arrow-circle">↗</div>
@@ -484,9 +464,9 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
             </a>
             <p>Your premier destination for high-end luxury handbags and accessories. We curate the finest collection to help you express your unique style.</p>
             <div class="social-links">
-                <a href="#" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
-                <a href="#" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
-                <a href="#" class="social-icon">
+                <a href="Facebook_ @Mummy J Luxe Bags" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
+                <a href="Instagram_ @mummy_j_luxebags" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+                <a href="Tiktok_ @mummyjemporium" class="social-icon">
                     <svg width="20" height="20" viewBox="0 0 448 512" fill="currentColor">
                         <path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z"/>
                     </svg>
@@ -512,13 +492,13 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
     </div>
     <div class="footer-bottom">
         <p>© 2026 Mummy J Emporium. All Rights Reserved.</p>
-        <p>Built with immense love ❤️ by Sasatech.</p>
+        <p>Built with immense love ❤️ by Sasatech...</p>
     </div>
 </footer>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, getDocs, query, orderBy, getCountFromServer, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, query, orderBy, addDoc, serverTimestamp, count } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
   const firebaseConfig = {
@@ -536,113 +516,38 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
   const auth = getAuth(app);
 
   const ADMIN_UID = "tPgPOqy3aPU4HeIAvWm6t64N3hG3";
-  let ALL_ORDERS = [];
 
   onAuthStateChanged(auth, (user) => {
       const uploadLink = document.getElementById('uploadLink');
       const dashboardLink = document.getElementById('dashboardLink');
       const loginLink = document.getElementById('loginLink');
       const logoutBtn = document.getElementById('logoutBtn');
+      const adminStats = document.getElementById('adminStats');
 
       if (user && user.uid === ADMIN_UID) {
           uploadLink.style.display = 'block';
           dashboardLink.style.display = 'block';
           loginLink.style.display = 'none';
           logoutBtn.style.display = 'block';
-      } else if (user) {
-          uploadLink.style.display = 'none';
-          dashboardLink.style.display = 'none';
-          loginLink.style.display = 'none';
-          logoutBtn.style.display = 'block';
+          adminStats.style.display = 'grid';
+          fetchStats();
       } else {
           uploadLink.style.display = 'none';
           dashboardLink.style.display = 'none';
           loginLink.style.display = 'block';
           logoutBtn.style.display = 'none';
+          adminStats.style.display = 'none';
       }
   });
 
-  /* --- DASHBOARD LOGIC --- */
-  window.openDashboard = async function() {
-      document.getElementById('adminDashboard').style.display = 'flex';
-      toggleDrawer(); 
-      backToStats();
-      
+  async function fetchStats() {
       try {
-          const visitorSnap = await getCountFromServer(collection(db, "visitors"));
-          const orderSnap = await getCountFromServer(collection(db, "orders"));
+          const ordersSnap = await getDocs(collection(db, "orders"));
+          document.getElementById('totalOrders').innerText = ordersSnap.size;
           
-          document.getElementById('statVisitors').innerText = visitorSnap.data().count;
-          document.getElementById('statOrders').innerText = orderSnap.data().count;
-
-          // Fetch actual orders for history view
-          const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
-          const snap = await getDocs(q);
-          ALL_ORDERS = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-      } catch (e) {
-          console.error("Error fetching stats:", e);
-      }
-  }
-
-  window.closeDashboard = function() {
-      document.getElementById('adminDashboard').style.display = 'none';
-  }
-
-  window.showOrderHistory = function() {
-      document.getElementById('mainStatsView').style.display = 'none';
-      document.getElementById('orderHistoryView').style.display = 'block';
-      filterOrders();
-  }
-
-  window.backToStats = function() {
-      document.getElementById('mainStatsView').style.display = 'block';
-      document.getElementById('orderHistoryView').style.display = 'none';
-  }
-
-  window.filterOrders = function() {
-      const dateVal = document.getElementById('orderDateFilter').value;
-      const searchVal = document.getElementById('orderSearch').value.toLowerCase();
-      const container = document.getElementById('ordersListContainer');
-      
-      let filtered = ALL_ORDERS.filter(o => {
-          const orderID = (o.orderID || "").toLowerCase();
-          const matchesSearch = orderID.includes(searchVal);
-          
-          let matchesDate = true;
-          if(dateVal && o.createdAt) {
-              const orderDate = o.createdAt.toDate().toISOString().split('T')[0];
-              matchesDate = orderDate === dateVal;
-          }
-          return matchesSearch && matchesDate;
-      });
-
-      let totalSales = 0;
-      container.innerHTML = filtered.map(o => {
-          totalSales += (o.totalAmount || 0);
-          const dateStr = o.createdAt ? o.createdAt.toDate().toLocaleString() : "N/A";
-          
-          let itemsHtml = (o.customerCart || []).map(item => `
-              <div>• ${item.name} (${item.color || 'Default'}) x${item.qty || 1} - ₦${Number(item.price).toLocaleString()}</div>
-          `).join('');
-
-          return `
-              <div class="order-item-card">
-                  <div class="order-header">
-                      <span>ID: ${o.orderID || 'N/A'}</span>
-                      <span>₦${Number(o.totalAmount).toLocaleString()}</span>
-                  </div>
-                  <div class="order-details-list">
-                      <div style="font-weight:700; color:#666;">Date: ${dateStr}</div>
-                      ${itemsHtml}
-                      <div style="margin-top:5px; font-style:italic; font-size:12px;">Status: ${o.status || 'Pending'}</div>
-                  </div>
-              </div>
-          `;
-      }).join('');
-
-      if(filtered.length === 0) container.innerHTML = "<p style='text-align:center; color:#999;'>No orders found.</p>";
-      document.getElementById('filteredSalesTotal').innerText = `₦${totalSales.toLocaleString()}`;
+          const visitorsSnap = await getDocs(collection(db, "visitors"));
+          document.getElementById('visitorCount').innerText = visitorsSnap.size;
+      } catch (e) { console.error("Stats Error:", e); }
   }
 
   /* --- VISITOR TRACKING --- */
@@ -738,6 +643,10 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
                   <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite('${item.id}', event)">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.84-8.84 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                   </button>
+                  ${!isOutOfStock ? `
+                  <button class="quick-add-btn" onclick="addToCart('${item.id}', event)" title="Quick Add to Cart">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                  </button>` : ''}
                   <a href="${isOutOfStock ? 'javascript:void(0)' : 'product-details.html?id=' + item.id}">
                       <div class="img-placeholder" style="background-image: url('${item.img || item.image}')">
                           ${isOutOfStock ? '<div class="stock-overlay">SOLD OUT</div>' : ''}
@@ -752,6 +661,24 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
       }).join('');
 
       pagination.style.display = endIdx < filteredItems.length ? 'block' : 'none';
+  }
+
+  window.addToCart = function(id, event) {
+      event.preventDefault();
+      const item = ALL_PRODUCTS.find(p => p.id === id);
+      if (!item) return;
+
+      let cart = JSON.parse(localStorage.getItem('mj_cart')) || [];
+      const index = cart.findIndex(c => c.id === id);
+
+      if (index === -1) {
+          cart.push({ ...item, quantity: 1 });
+          localStorage.setItem('mj_cart', JSON.stringify(cart));
+          updateCartBadge();
+          alert(`${item.name} added to cart!`);
+      } else {
+          alert(`Item is already in your cart.`);
+      }
   }
 
   window.toggleFavorite = function(id, event) {

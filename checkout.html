@@ -39,9 +39,7 @@
         <a href="javascript:void(0)" class="copy-tag" onclick="copyAcc()">COPY</a>
         <br>
         <span class="label">Account Name</span>
-        <p>MUMMY J EMPORIUM
-                OR
-AKPAN FREEDOM VICTORIA</p>
+        <p>MUMMY J EMPORIUM OR AKPAN FREEDOM VICTORIA</p>
     </div>
 
     <button id="payMadeBtn" class="btn-confirm">✅ I HAVE MADE PAYMENT</button>
@@ -58,18 +56,24 @@ AKPAN FREEDOM VICTORIA</p>
         storageBucket: "mummy-jweb.firebasestorage.app",
         messagingSenderId: "924167105238",
         appId: "1:924167105238:web:56261faee1ca1ee9d7b777",
-        measurementId: "G-YMNFG7ZRV4"
+        measurementId: "G-YMNFG7RV4"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
     const cart = JSON.parse(localStorage.getItem('mj_cart')) || [];
+    const customer = JSON.parse(localStorage.getItem('mj_customer')) || { name: "Guest", phone: "N/A", address: "N/A" };
     const waNumber = "2348123541592"; 
     let runningTotal = 0;
 
     let receiptID = "MJ-" + Math.floor(1000 + Math.random() * 9000);
     let textSummary = `*ORDER RECEIPT: ${receiptID}*\n`;
+    textSummary += `━━━━━━━━━━━━━━━━━━━━\n`;
+    textSummary += `*CUSTOMER DETAILS*\n`;
+    textSummary += `Name: ${customer.name}\n`;
+    textSummary += `Phone: ${customer.phone}\n`;
+    textSummary += `Address: ${customer.address}\n`;
     textSummary += `━━━━━━━━━━━━━━━━━━━━\n`;
     textSummary += `*MUMMY J EMPORIUM*\n`;
     textSummary += `Date: ${new Date().toLocaleDateString()}\n`;
@@ -96,6 +100,9 @@ AKPAN FREEDOM VICTORIA</p>
         textSummary += `_Please verify and process my order._`;
 
         document.getElementById('finalTotal').innerText = `₦${runningTotal.toLocaleString()}`;
+    } else {
+        // If they refresh and cart is gone, alert them
+        alert("Session expired or cart empty. Please return to store.");
     }
 
     document.getElementById('payMadeBtn').addEventListener('click', async function() {
@@ -111,25 +118,30 @@ AKPAN FREEDOM VICTORIA</p>
         const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(textSummary)}`;
 
         try {
-            // 1. Clear cart FIRST so it definitely happens
-            localStorage.removeItem('mj_cart');
-
-            // 2. Record to Firestore
+            // 1. Record to Firestore WITH Customer Info
             await addDoc(collection(db, "orders"), {
                 orderID: receiptID,
+                customerName: customer.name,
+                customerPhone: customer.phone,
+                customerAddress: customer.address,
                 totalAmount: runningTotal,
                 customerCart: cart,
                 status: "Pending Verification",
                 createdAt: serverTimestamp()
             });
 
-            // 3. Redirect
+            // 2. Clear cart and customer info AFTER success
+            localStorage.removeItem('mj_cart');
+            localStorage.removeItem('mj_customer');
+
+            // 3. Redirect to WhatsApp
             window.location.replace(waUrl);
 
         } catch (error) {
             console.error("Firestore Error:", error);
-            // Even if Firebase fails, we must clear cart and send to WhatsApp
+            // Even if Firebase fails, we clear and send WhatsApp so the sale isn't lost
             localStorage.removeItem('mj_cart');
+            localStorage.removeItem('mj_customer');
             window.location.replace(waUrl);
         }
     });

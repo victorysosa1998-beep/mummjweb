@@ -22,10 +22,30 @@
         body { font-family: 'Inter', sans-serif; color: var(--navy); background-color: #fff; padding-top: 100px; }
         .container { max-width: 1300px; margin: 0 auto; padding: 0 5%; }
 
+        /* --- BACK ARROW --- */
+        .back-arrow {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            text-decoration: none;
+            color: var(--navy);
+            transition: 0.3s;
+        }
+        .back-arrow:hover { transform: translateX(-5px); background: var(--navy); color: white; }
+
         /* --- NAVBAR --- */
         .navbar { 
             position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
-            background: white; display: flex; justify-content: space-between; 
+            background: white; display: flex; justify-content: center; /* Centered logo to make space for arrow */
             align-items: center; padding: 15px 5%; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
         .logo-img { height: 55px; width: auto; cursor: pointer; }
@@ -203,6 +223,12 @@
 </head>
 <body>
 
+<a href="index.html" class="back-arrow">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+</a>
+
 <header class="navbar">
     <a href="index.html"><img src="video/mjlogo1.png" alt="Logo" class="logo-img"></a>
 </header>
@@ -341,7 +367,6 @@
                 tempImages = [...(productData.images || [])];
                 renderAdminImages();
 
-                // Logic to keep the URL field visible if an image was previously deleted
                 if(productData.imagesDeleted === true) {
                     document.getElementById('replacementUrlField').style.display = 'block';
                 }
@@ -423,15 +448,12 @@
         tempImages.forEach((src, index) => {
             const card = document.createElement('div');
             card.className = "image-edit-card";
-            
             const img = document.createElement('img');
             img.src = src;
-            
             const delBtn = document.createElement('button');
             delBtn.className = "del-img-btn";
             delBtn.innerHTML = "&times;";
             delBtn.onclick = () => removeImage(index);
-            
             card.appendChild(img);
             card.appendChild(delBtn);
             list.appendChild(card);
@@ -442,7 +464,6 @@
         if(confirm("Remove this image? The URL field will remain open for you to add new links.")) {
             tempImages.splice(index, 1);
             renderAdminImages();
-            // Show the URL replacement field
             document.getElementById('replacementUrlField').style.display = 'block';
         }
     };
@@ -450,7 +471,6 @@
     window.addNewImageUrl = () => {
         const urlInput = document.getElementById('newImgUrl');
         const url = urlInput.value.trim();
-        
         if(url) {
             tempImages.push(url);
             urlInput.value = "";
@@ -473,7 +493,7 @@
             inStock: newStock,
             images: tempImages,
             img: tempImages.length > 0 ? tempImages[0] : (productData.img || ""),
-            imagesDeleted: urlFieldVisible // Persist the state that an image was removed
+            imagesDeleted: urlFieldVisible
         };
 
         if (newPrice !== productData.price) {
@@ -492,12 +512,9 @@
         const carousel = document.getElementById('imageCarousel');
         const dotsContainer = document.getElementById('carouselDots');
         let imgList = productData.images || [];
-        
         if (imgList.length === 0 && productData.img) imgList = [productData.img];
-
         carousel.innerHTML = imgList.map(src => `<img src="${src}" alt="Product">`).join('');
         dotsContainer.innerHTML = imgList.map((_, i) => `<div class="dot ${i===0 ? 'active' : ''}"></div>`).join('');
-
         carousel.onscroll = () => {
             const index = Math.round(carousel.scrollLeft / carousel.offsetWidth);
             document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === index));
@@ -528,8 +545,6 @@
             img: tempImages[0] || productData.img 
         });
         localStorage.setItem('mj_cart', JSON.stringify(cart));
-        
-        // Removed default alert; using custom success overlay only
         triggerSuccess("ADDED", "Item added to your cart!");
     };
 

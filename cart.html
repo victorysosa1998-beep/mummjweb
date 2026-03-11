@@ -28,7 +28,6 @@
         }
         .cart-item:hover { transform: translateY(-2px); }
         
-        /* NEW: Link styling for the product clickable area */
         .item-link {
             display: flex;
             align-items: center;
@@ -95,12 +94,56 @@
             margin-top: 20px; 
             font-size: 16px;
             transition: 0.3s;
+            cursor: pointer;
+            border: none;
+            width: 100%;
         }
         .checkout-btn:hover { background: var(--blue); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(68, 108, 255, 0.3); }
         .checkout-btn.disabled {
             background: #ccc;
             pointer-events: none;
             box-shadow: none;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 25px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .modal-content h2 { margin-top: 0; font-family: 'Anton'; letter-spacing: 1px; }
+        .modal-content input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-family: 'Inter';
+            box-sizing: border-box;
+        }
+        .modal-content input:focus { border-color: var(--blue); outline: none; }
+        .confirm-order-btn {
+            background: var(--blue);
+            color: white;
+            border: none;
+            padding: 18px;
+            width: 100%;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 10px;
         }
 
         @media (max-width: 600px) {
@@ -115,33 +158,69 @@
 
     <div class="container">
         <h1>MY CART</h1>
-        
         <div id="cartContent"></div>
         
         <div class="cart-summary">
             <p style="color: #666; font-size: 14px; font-weight: 600;">ESTIMATED TOTAL</p>
             <div id="totalDisplay">₦0</div>
-            <a href="checkout.html" id="checkoutBtn" class="checkout-btn">PROCEED TO CHECKOUT</a>
+            <button id="checkoutBtn" class="checkout-btn">PROCEED TO CHECKOUT</button>
             <a href="index.html" style="display: block; text-align: center; margin-top: 20px; color: var(--navy); text-decoration: none; font-size: 14px; font-weight: 700;">← Continue Shopping</a>
         </div>
     </div>
 
+    <div class="modal-overlay" id="checkoutModal">
+        <div class="modal-content">
+            <h2>DELIVERY DETAILS</h2>
+            <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Please provide your details to complete the order.</p>
+            <input type="text" id="custName" placeholder="Full Name" required>
+            <input type="text" id="custPhone" placeholder="Phone Number" required>
+            <input type="text" id="custAddress" placeholder="Delivery Address" required>
+            <button class="confirm-order-btn" id="confirmOrder">CONFIRM & GO TO PAYMENT</button>
+            <button onclick="closeModal()" style="background:none; border:none; color:#999; width:100%; margin-top:15px; cursor:pointer; font-weight:600;">Cancel</button>
+        </div>
+    </div>
+
     <script>
+        const checkoutModal = document.getElementById('checkoutModal');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        const confirmOrderBtn = document.getElementById('confirmOrder');
+
+        checkoutBtn.addEventListener('click', () => {
+            checkoutModal.style.display = 'flex';
+        });
+
+        window.closeModal = function() {
+            checkoutModal.style.display = 'none';
+        }
+
+        confirmOrderBtn.addEventListener('click', () => {
+            const name = document.getElementById('custName').value;
+            const phone = document.getElementById('custPhone').value;
+            const address = document.getElementById('custAddress').value;
+
+            if(!name || !phone || !address) {
+                alert("Please fill in all details");
+                return;
+            }
+
+            // Save user info to use on checkout page
+            const customerData = { name, phone, address };
+            localStorage.setItem('mj_customer', JSON.stringify(customerData));
+
+            // Move to checkout WITHOUT clearing cart yet
+            window.location.href = "checkout.html";
+        });
+
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('mj_cart')) || [];
             const container = document.getElementById('cartContent');
             const totalDisplay = document.getElementById('totalDisplay');
-            const checkoutBtn = document.getElementById('checkoutBtn');
             let total = 0;
             
             container.innerHTML = "";
 
             if (cart.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align:center; padding: 60px 0;">
-                        <p style="font-size: 18px; color: #888;">Your cart is currently empty.</p>
-                    </div>
-                `;
+                container.innerHTML = `<div style="text-align:center; padding: 60px 0;"><p style="font-size: 18px; color: #888;">Your cart is currently empty.</p></div>`;
                 totalDisplay.innerText = "₦0";
                 checkoutBtn.classList.add('disabled');
                 return;
@@ -165,7 +244,6 @@
                                 <p>Variant: <b>${item.color || 'Standard'}</b></p>
                             </div>
                         </a>
-
                         <div class="controls-wrapper">
                              <div class="qty-controls">
                                 <button type="button" class="qty-btn" onclick="changeQty(${index}, -1)">-</button>
@@ -174,7 +252,6 @@
                             </div>
                             <button type="button" class="remove-btn" onclick="removeItem(${index})">Remove Item</button>
                         </div>
-
                         <div class="item-price-info" style="text-align: right">
                             <p style="font-weight:800; font-size: 20px; color: var(--navy);">₦${itemTotal.toLocaleString()}</p>
                             <p style="font-size: 12px; color: #999;">₦${itemPrice.toLocaleString()} each</p>
@@ -182,7 +259,6 @@
                     </div>
                 `;
             });
-
             totalDisplay.innerText = `₦${total.toLocaleString()}`;
         }
 
@@ -190,8 +266,7 @@
             let cart = JSON.parse(localStorage.getItem('mj_cart')) || [];
             if (cart[index]) {
                 let currentQty = parseInt(cart[index].qty) || 1;
-                let newQty = currentQty + delta;
-                cart[index].qty = Math.max(1, Math.min(99, newQty));
+                cart[index].qty = Math.max(1, Math.min(99, currentQty + delta));
                 localStorage.setItem('mj_cart', JSON.stringify(cart));
                 renderCart();
             }

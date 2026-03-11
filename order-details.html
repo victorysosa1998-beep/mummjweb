@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Management - Mummy J</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+
+:root{
+--navy:#12256B;
+--blue:#446CFF;
+--green:#28a745;
+}
+
+body{
+font-family:'Inter',sans-serif;
+background:#f4f7f6;
+padding:40px 5%;
+color:var(--navy);
+}
+
+.container{
+max-width:700px;
+margin:auto;
+}
+
+.back-btn{
+text-decoration:none;
+color:var(--blue);
+font-weight:700;
+display:inline-block;
+margin-bottom:20px;
+cursor:pointer;
+}
+
+.card{
+background:white;
+padding:40px;
+border-radius:25px;
+box-shadow:0 10px 30px rgba(0,0,0,0.05);
+}
+
+h1{
+font-family:'Anton';
+letter-spacing:1px;
+font-size:28px;
+margin-bottom:20px;
+border-bottom:2px solid #eee;
+padding-bottom:10px;
+}
+
+.section-title{
+font-size:12px;
+text-transform:uppercase;
+color:#888;
+letter-spacing:1px;
+margin-top:20px;
+font-weight:700;
+}
+
+.info-group{
+margin-bottom:15px;
+}
+
+.info-group p{
+font-weight:700;
+margin:5px 0;
+}
+
+.status-picker{
+width:100%;
+padding:15px;
+border-radius:12px;
+border:2px solid #eee;
+font-family:'Inter';
+font-weight:700;
+color:var(--navy);
+margin-top:10px;
+cursor:pointer;
+transition: background-color 0.3s, color 0.3s;
+}
+
+/* Green toggle style */
+.status-delivered {
+background-color: var(--green) !important;
+color: white !important;
+border-color: var(--green) !important;
+}
+
+.item-row{
+display:flex;
+justify-content:space-between;
+padding:10px 0;
+border-bottom:1px dashed #eee;
+font-size:14px;
+
+/* prevents cutting rows in pdf */
+page-break-inside:avoid;
+}
+
+.total-row{
+display:flex;
+justify-content:space-between;
+font-weight:800;
+font-size:22px;
+margin-top:20px;
+color:var(--blue);
+}
+
+.action-btns{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+margin-top:30px;
+}
+
+.btn{
+padding:18px;
+border-radius:12px;
+border:none;
+font-weight:800;
+cursor:pointer;
+transition:0.3s;
+font-family:'Inter';
+text-align:center;
+text-decoration:none;
+}
+
+.btn-save{
+background:var(--navy);
+color:white;
+}
+
+.btn-print{
+background:#eef2ff;
+color:var(--blue);
+}
+
+.btn:hover{
+opacity:0.8;
+transform:translateY(-2px);
+}
+
+.btn:disabled{
+background:#ccc;
+cursor:not-allowed;
+}
+
+/* PDF Capture Area */
+
+#printArea{
+padding:40px;
+background:white !important;
+width:700px;
+box-sizing:border-box;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<a href="orders.html" class="back-btn">← Back to History</a>
+
+<div class="card" id="mainCard">
+
+<div id="printArea">
+
+<h1>ORDER RECEIPT</h1>
+
+<div id="orderIDDisplay" style="font-weight:800;color:var(--blue);margin-bottom:20px;">
+Verifying Admin...
+</div>
+
+<div class="section-title">Customer Information</div>
+
+<div class="info-group">
+<p id="detName">...</p>
+<p id="detPhone">...</p>
+<p id="detAddress">...</p>
+</div>
+
+<div class="section-title">Order Items</div>
+
+<div id="detItems"></div>
+
+<div class="total-row">
+<span>Grand Total</span>
+<span id="detTotal">₦0</span>
+</div>
+
+</div>
+
+<div class="section-title">Management Tools</div>
+
+<select class="status-picker" id="statusSelector">
+<option value="Pending Verification">Pending Verification</option>
+<option value="Confirmed">Confirmed</option>
+<option value="Sent Out">Sent Out</option>
+<option value="Delivered">Delivered</option>
+</select>
+
+<div class="action-btns">
+<button class="btn btn-save" id="saveStatusBtn">UPDATE STATUS</button>
+<button class="btn btn-print" id="printBtn">PRINT TO PDF</button>
+</div>
+
+</div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const firebaseConfig={
+apiKey:"AIzaSyBlGgRRrPP67b7EHyYm_eL1R08zFi08aLg",
+authDomain:"mummy-jweb.firebaseapp.com",
+projectId:"mummy-jweb",
+storageBucket:"mummy-jweb.firebasestorage.app",
+messagingSenderId:"924167105238",
+appId:"1:924167105238:web:56261faee1ca1ee9d7b777",
+measurementId:"G-YMNFG7RV4"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+const auth=getAuth(app);
+
+const ADMIN_UID="tPgPOqy3aPU4HeIAvWm6t64N3hG3";
+
+const urlParams=new URLSearchParams(window.location.search);
+const orderDocId=urlParams.get('id');
+
+// Function to handle the green color toggle
+function updateStatusUI() {
+    const selector = document.getElementById('statusSelector');
+    if (selector.value === "Delivered") {
+        selector.classList.add('status-delivered');
+    } else {
+        selector.classList.remove('status-delivered');
+    }
+}
+
+document.getElementById('statusSelector').addEventListener('change', updateStatusUI);
+
+onAuthStateChanged(auth,(user)=>{
+
+if(!user || user.uid!==ADMIN_UID){
+alert("Unauthorized. Please login as Admin.");
+window.location.href="login.html";
+}
+
+else{
+loadOrderDetails();
+}
+
+});
+
+async function loadOrderDetails(){
+
+if(!orderDocId) return;
+
+try{
+
+const docRef=doc(db,"orders",orderDocId);
+const docSnap=await getDoc(docRef);
+
+if(docSnap.exists()){
+
+const data=docSnap.data();
+
+document.getElementById('orderIDDisplay').innerText=`ID: ${data.orderID || 'N/A'}`;
+document.getElementById('detName').innerText=data.customerName || "No Name";
+document.getElementById('detPhone').innerText=data.customerPhone || "No Phone";
+document.getElementById('detAddress').innerText=data.customerAddress || "No Address";
+
+document.getElementById('detTotal').innerText=`₦${Number(data.totalAmount).toLocaleString()}`;
+
+document.getElementById('statusSelector').value=data.status || "Pending Verification";
+updateStatusUI(); // Run color check on load
+
+let itemsHtml=(data.customerCart || []).map(item=>`
+
+<div class="item-row">
+<span>${item.name || 'Product'} (${item.color || 'Standard'}) x${item.qty || 1}</span>
+<span>₦${Number(item.price).toLocaleString()}</span>
+</div>
+
+`).join('');
+
+document.getElementById('detItems').innerHTML=itemsHtml;
+
+}
+
+}
+
+catch(error){
+console.error(error);
+}
+
+}
+
+document.getElementById('saveStatusBtn').addEventListener('click',async()=>{
+
+const newStatus=document.getElementById('statusSelector').value;
+
+const saveBtn=document.getElementById('saveStatusBtn');
+
+saveBtn.innerText="UPDATING...";
+saveBtn.disabled=true;
+
+try{
+
+const docRef=doc(db,"orders",orderDocId);
+
+await updateDoc(docRef,{status:newStatus});
+
+alert("Status updated successfully!");
+
+}
+
+catch(e){
+
+alert("Update Failed: "+e.message);
+
+}
+
+finally{
+
+saveBtn.innerText="UPDATE STATUS";
+saveBtn.disabled=false;
+
+}
+
+});
+
+
+/* FIXED PDF FUNCTION */
+
+document.getElementById('printBtn').addEventListener('click',()=>{
+
+const element=document.getElementById('printArea');
+
+const orderIdText=document.getElementById('orderIDDisplay').innerText;
+
+const opt={
+
+margin:10,
+
+filename:`MummyJ_Receipt_${orderIdText.replace('ID: ','')}.pdf`,
+
+image:{type:'jpeg',quality:0.98},
+
+html2canvas:{
+scale:2,
+useCORS:true,
+letterRendering:true
+},
+
+jsPDF:{
+unit:'mm',
+format:'a4',
+orientation:'portrait'
+},
+
+pagebreak:{mode:['avoid-all','css','legacy']}
+
+};
+
+/* wait for DOM rendering */
+
+setTimeout(()=>{
+
+html2pdf().set(opt).from(element).save();
+
+},800);
+
+});
+
+</script>
+
+</body>
+</html>
