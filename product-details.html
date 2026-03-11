@@ -45,7 +45,7 @@
         /* --- NAVBAR --- */
         .navbar { 
             position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
-            background: white; display: flex; justify-content: center;
+            background: white; display: flex; justify-content: center; /* Centered logo to make space for arrow */
             align-items: center; padding: 15px 5%; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
         .logo-img { height: 55px; width: auto; cursor: pointer; }
@@ -110,6 +110,7 @@
         .brand-label { color: var(--blue); font-weight: 700; letter-spacing: 2px; font-size: 12px; margin-bottom: 10px; display: block; }
         .product-title { font-family: 'Anton', sans-serif; font-size: 48px; line-height: 1.1; margin-bottom: 15px; }
         
+        /* PRICE STYLING */
         .price-wrapper { display: flex; align-items: baseline; gap: 15px; margin-bottom: 20px; }
         .product-price { font-size: 32px; font-weight: 800; color: var(--navy); }
         .old-price { font-size: 20px; color: var(--danger); text-decoration: line-through; font-weight: 600; opacity: 0.8; }
@@ -174,22 +175,19 @@
         .btn-save { width: 100%; background: var(--blue); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
         .btn-del { width: 100%; background: #fff; color: var(--danger); border: 1px solid var(--danger); padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
-        .admin-image-manager, .admin-color-manager { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
-        .image-edit-list, .color-edit-list { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 10px; }
-        .image-edit-card, .color-edit-card { position: relative; flex-shrink: 0; width: 80px; height: 80px; border-radius: 10px; overflow: hidden; border: 1px solid #ddd; }
+        .admin-image-manager { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+        .image-edit-list { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 10px; }
+        .image-edit-card { position: relative; flex-shrink: 0; width: 80px; height: 80px; border-radius: 10px; overflow: hidden; border: 1px solid #ddd; }
         .image-edit-card img { width: 100%; height: 100%; object-fit: cover; }
-        .color-edit-card { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5px; background: #f9f9f9; }
-        .color-preview-box { width: 30px; height: 30px; border-radius: 50%; margin-bottom: 5px; border: 1px solid #ccc; }
-        .color-name-label { font-size: 9px; font-weight: 700; text-align: center; overflow: hidden; text-overflow: ellipsis; width: 100%; }
-        
         .del-img-btn { position: absolute; top: 2px; right: 2px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-weight: bold; }
         
-        #replacementUrlField, #newColorField { 
+        #replacementUrlField { 
             margin-top: 10px; 
             padding: 15px; 
             background: #f9f9f9; 
             border-radius: 12px; 
             border: 1px solid #eee;
+            display: none; 
         }
 
         .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
@@ -199,6 +197,7 @@
         input:checked + .slider { background-color: var(--success); }
         input:checked + .slider:before { transform: translateX(24px); }
 
+        /* --- SUCCESS OVERLAY --- */
         #successOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(18, 37, 107, 0.95); backdrop-filter: blur(10px);
@@ -302,26 +301,12 @@
                     </label>
                 </div>
 
-                <div class="admin-color-manager">
-                    <label class="selector-label">MANAGE COLORS</label>
-                    <div class="color-edit-list" id="adminColorList"></div>
-                    
-                    <div id="newColorField">
-                        <label class="selector-label">ADD NEW COLOR</label>
-                        <div style="display:flex; gap:10px;">
-                            <input type="text" id="newColorName" class="admin-input" placeholder="e.g. Red" style="flex:1;">
-                            <input type="text" id="newColorHex" class="admin-input" placeholder="e.g. #FF0000" style="flex:1;">
-                        </div>
-                        <button class="btn-save" style="margin-top:10px; padding: 10px; font-size: 12px;" onclick="addNewColor()">ADD COLOR TO PRODUCT</button>
-                    </div>
-                </div>
-
                 <div class="admin-image-manager">
                     <label class="selector-label">MANAGE IMAGES</label>
                     <div class="image-edit-list" id="adminImageList"></div>
                     
-                    <div id="replacementUrlField" style="display:block;">
-                        <label class="selector-label">ADD NEW IMAGE URL</label>
+                    <div id="replacementUrlField">
+                        <label class="selector-label">REPLACE WITH NEW IMAGE URL</label>
                         <input type="text" id="newImgUrl" class="admin-input" placeholder="Paste image link here...">
                         <button class="btn-save" style="margin-top:10px; padding: 10px; font-size: 12px;" onclick="addNewImageUrl()">ADD URL TO GALLERY</button>
                     </div>
@@ -352,13 +337,13 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
+    const storage = getStorage(app);
 
     const ADMIN_UID = "tPgPOqy3aPU4HeIAvWm6t64N3hG3";
     const pid = new URLSearchParams(window.location.search).get('id');
     let productData = null;
     let selectedColor = "Default";
     let tempImages = [];
-    let tempColors = [];
 
     window.triggerSuccess = (title, sub) => {
         const overlay = document.getElementById('successOverlay');
@@ -380,9 +365,11 @@
                 document.getElementById('stockToggle').checked = productData.inStock !== false;
                 
                 tempImages = [...(productData.images || [])];
-                tempColors = [...(productData.colors || [])];
                 renderAdminImages();
-                renderAdminColors();
+
+                if(productData.imagesDeleted === true) {
+                    document.getElementById('replacementUrlField').style.display = 'block';
+                }
             }
         }
     }
@@ -422,9 +409,15 @@
         badge.className = `stock-status-badge ${isStock ? 'status-in' : 'status-out'}`;
         
         const atc = document.getElementById('atcBtn');
-        atc.disabled = !isStock;
-        atc.innerText = isStock ? "ADD TO CART" : "SOLD OUT";
-        atc.style.opacity = isStock ? "1" : "0.5";
+        if(!isStock) {
+            atc.disabled = true;
+            atc.innerText = "SOLD OUT";
+            atc.style.opacity = "0.5";
+        } else {
+            atc.disabled = false;
+            atc.innerText = "ADD TO CART";
+            atc.style.opacity = "1";
+        }
 
         const grid = document.getElementById('colorGrid');
         grid.innerHTML = ""; 
@@ -434,7 +427,6 @@
                 const sw = document.createElement('div');
                 sw.className = `color-swatch ${i===0 ? 'active' : ''}`;
                 sw.style.backgroundColor = c.hex || "#ddd";
-                sw.title = c.name;
                 sw.onclick = () => {
                     document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
                     sw.classList.add('active');
@@ -444,65 +436,15 @@
                 grid.appendChild(sw);
             });
             selectedColor = productData.colors[0].name;
-        } else {
-            document.getElementById('colorArea').style.display = 'none';
         }
         setupImages();
         updateWA();
     }
 
-    // --- ADMIN COLOR RENDERER ---
-    function renderAdminColors() {
-        const list = document.getElementById('adminColorList');
-        list.innerHTML = "";
-        tempColors.forEach((c, index) => {
-            const card = document.createElement('div');
-            card.className = "color-edit-card";
-            
-            const prev = document.createElement('div');
-            prev.className = "color-preview-box";
-            prev.style.backgroundColor = c.hex;
-            
-            const label = document.createElement('span');
-            label.className = "color-name-label";
-            label.innerText = c.name;
-            
-            const delBtn = document.createElement('button');
-            delBtn.className = "del-img-btn";
-            delBtn.innerHTML = "&times;";
-            delBtn.onclick = () => removeColor(index);
-            
-            card.appendChild(prev);
-            card.appendChild(label);
-            card.appendChild(delBtn);
-            list.appendChild(card);
-        });
-    }
-
-    window.removeColor = (index) => {
-        if(confirm("Delete this color option?")) {
-            tempColors.splice(index, 1);
-            renderAdminColors();
-        }
-    };
-
-    window.addNewColor = () => {
-        const name = document.getElementById('newColorName').value.trim();
-        const hex = document.getElementById('newColorHex').value.trim();
-        if(name && hex) {
-            tempColors.push({ name, hex });
-            document.getElementById('newColorName').value = "";
-            document.getElementById('newColorHex').value = "";
-            renderAdminColors();
-        } else {
-            alert("Enter both Name and Hex code!");
-        }
-    };
-
-    // --- ADMIN IMAGE RENDERER ---
     function renderAdminImages() {
         const list = document.getElementById('adminImageList');
         list.innerHTML = "";
+        
         tempImages.forEach((src, index) => {
             const card = document.createElement('div');
             card.className = "image-edit-card";
@@ -519,9 +461,10 @@
     }
 
     window.removeImage = (index) => {
-        if(confirm("Remove this image?")) {
+        if(confirm("Remove this image? The URL field will remain open for you to add new links.")) {
             tempImages.splice(index, 1);
             renderAdminImages();
+            document.getElementById('replacementUrlField').style.display = 'block';
         }
     };
 
@@ -532,6 +475,8 @@
             tempImages.push(url);
             urlInput.value = "";
             renderAdminImages();
+        } else {
+            alert("Please enter a valid image URL.");
         }
     };
 
@@ -540,14 +485,15 @@
         const newPrice = Number(document.getElementById('editPrice').value);
         const newDesc = document.getElementById('editDesc').value;
         const newStock = document.getElementById('stockToggle').checked;
+        const urlFieldVisible = document.getElementById('replacementUrlField').style.display === 'block';
 
         let updatePayload = {
             name: newName,
             description: newDesc,
             inStock: newStock,
             images: tempImages,
-            colors: tempColors,
-            img: tempImages.length > 0 ? tempImages[0] : (productData.img || "")
+            img: tempImages.length > 0 ? tempImages[0] : (productData.img || ""),
+            imagesDeleted: urlFieldVisible
         };
 
         if (newPrice !== productData.price) {
@@ -596,7 +542,7 @@
             name: productData.name, 
             price: productData.price, 
             color: selectedColor, 
-            img: (tempImages.length > 0 ? tempImages[0] : productData.img)
+            img: tempImages[0] || productData.img 
         });
         localStorage.setItem('mj_cart', JSON.stringify(cart));
         triggerSuccess("ADDED", "Item added to your cart!");
