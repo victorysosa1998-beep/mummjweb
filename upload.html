@@ -24,7 +24,6 @@
             box-sizing: border-box; outline: none; font-family: 'Inter'; font-size: 15px;
         }
         
-        /* Color Picker Styles */
         .color-adder-row { display: flex; gap: 10px; margin-bottom: 10px; }
         .color-preview-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; min-height: 40px; }
         .color-chip { 
@@ -41,7 +40,6 @@
         }
         .btn-upload:hover { background: var(--blue); }
 
-        /* Inventory List */
         .inventory-item { 
             display: flex; justify-content: space-between; align-items: center; 
             padding: 20px; border-bottom: 1px solid #eee; background: #fff; border-radius: 15px; margin-bottom: 10px;
@@ -75,8 +73,28 @@
     </div>
 
     <div class="form-group">
+        <label>Extra Image 1 (Optional)</label>
+        <input type="text" id="imageUrl2" placeholder="Paste second image link">
+    </div>
+
+    <div class="form-group">
+        <label>Extra Image 2 (Optional)</label>
+        <input type="text" id="imageUrl3" placeholder="Paste third image link">
+    </div>
+
+    <div class="form-group">
         <label>Product Name</label>
         <input type="text" id="itemName" placeholder="e.g. Vernissage Leather Tote">
+    </div>
+
+    <div class="form-group">
+        <label>Target Category</label>
+        <select id="itemCategory">
+            <option value="handbag">Handbag</option>
+            <option value="wallet">Wallet</option>
+            <option value="new arrivals">New Arrivals</option>
+            <option value="accessories">Accessories</option>
+        </select>
     </div>
 
     <div class="form-group">
@@ -167,18 +185,27 @@
     window.uploadProduct = async () => {
         const overlay = document.getElementById('loadingOverlay');
         const name = document.getElementById('itemName').value;
+        const category = document.getElementById('itemCategory').value; // Get Category Value
         const price = document.getElementById('itemPrice').value;
-        const img = document.getElementById('imageUrl').value;
+        const img1 = document.getElementById('imageUrl').value;
+        const img2 = document.getElementById('imageUrl2').value;
+        const img3 = document.getElementById('imageUrl3').value;
         const desc = document.getElementById('itemDesc').value;
 
-        if(!name || !price || !img) return alert("Fill required fields!");
+        if(!name || !price || !img1) return alert("Fill required fields!");
+
+        const images = [img1];
+        if(img2) images.push(img2);
+        if(img3) images.push(img3);
 
         try {
             overlay.style.display = 'flex';
             await addDoc(collection(db, "products"), {
                 name,
+                category, // Save Category to Firestore
                 price: Number(price),
-                img,
+                img: img1, 
+                images: images,
                 description: desc,
                 colors: tempColors,
                 inStock: true,
@@ -202,7 +229,7 @@
                 div.className = "inventory-item";
                 div.innerHTML = `
                     <div>
-                        <strong>${p.name}</strong><br>
+                        <strong>${p.name}</strong> <span style="font-size:10px; color:#666;">(${p.category || 'uncategorized'})</span><br>
                         <span class="status-badge ${isStock ? 'status-in' : 'status-out'}">${isStock ? 'In Stock' : 'Out of Stock'}</span>
                     </div>
                     <div class="action-btns">

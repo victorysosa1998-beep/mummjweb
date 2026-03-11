@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Checkout - Mummy J</title>
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
@@ -27,27 +28,45 @@
         <span id="finalTotal">₦0</span>
     </div>
     
-    <p class="instruction" style="margin-top: 20px;">Transfer the total amount to the account below. Once done, click the <b>Payment Made</b> button to notify the admin.</p>
+    <p class="instruction" style="margin-top: 20px;">Transfer the total amount to the account below. Once done, click the <b>Payment Made</b> button to notify the admin via WhatsApp.</p>
 
     <div class="account-box">
         <span class="label">Bank Name</span>
-        <p>GT BANK</p>
+        <p>MoniePoint</p>
         <br>
         <span class="label">Account Number</span>
-        <p id="accNum" style="font-size: 24px; letter-spacing: 1px;">0123456789</p>
+        <p id="accNum" style="font-size: 24px; letter-spacing: 1px;">6390425408</p>
         <a href="javascript:void(0)" class="copy-tag" onclick="copyAcc()">COPY</a>
         <br>
         <span class="label">Account Name</span>
-        <p>MUMMY J EMPORIUM</p>
+        <p>MUMMY J EMPORIUM
+                OR
+AKPAN FREEDOM VICTORIA</p>
     </div>
 
     <button id="payMadeBtn" class="btn-confirm">✅ I HAVE MADE PAYMENT</button>
 </div>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlGgRRrPP67b7EHyYm_eL1R08zFi08aLg",
+        authDomain: "mummy-jweb.firebaseapp.com",
+        projectId: "mummy-jweb",
+        storageBucket: "mummy-jweb.firebasestorage.app",
+        messagingSenderId: "924167105238",
+        appId: "1:924167105238:web:56261faee1ca1ee9d7b777",
+        measurementId: "G-YMNFG7ZRV4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     const cart = JSON.parse(localStorage.getItem('mj_cart')) || [];
     const waNumber = "2348123541592"; 
-    let total = 0;
+    let runningTotal = 0;
 
     let receiptID = "MJ-" + Math.floor(1000 + Math.random() * 9000);
     let textSummary = `*ORDER RECEIPT: ${receiptID}*\n`;
@@ -56,41 +75,78 @@
     textSummary += `Date: ${new Date().toLocaleDateString()}\n`;
     textSummary += `━━━━━━━━━━━━━━━━━━━━\n\n`;
 
-    cart.forEach(item => {
-        // Clean the price string to ensure valid math
-        const cleanPriceStr = String(item.price).replace(/[^0-9.]/g, '');
-        const itemPrice = parseFloat(cleanPriceStr) || 0;
-        const itemQty = parseInt(item.qty) || 1;
-        
-        let subtotal = itemPrice * itemQty;
-        total += subtotal;
-        
-        textSummary += `🔹 *${item.name}*\n`;
-        textSummary += `   Color: ${item.color || 'Standard'} | Qty: ${itemQty}\n`;
-        textSummary += `   Price: ₦${subtotal.toLocaleString()}\n\n`;
-    });
+    if (cart.length > 0) {
+        cart.forEach(item => {
+            const rawPrice = item.price ? String(item.price).replace(/[^\d.-]/g, '') : "0";
+            const itemPrice = parseFloat(rawPrice) || 0;
+            const itemQty = parseInt(item.qty) || 1;
+            
+            let itemSubtotal = itemPrice * itemQty;
+            runningTotal += itemSubtotal;
+            
+            textSummary += `🔹 *${item.name || 'Product'}*\n`;
+            textSummary += `   Color: ${item.color || 'Standard'} | Qty: ${itemQty}\n`;
+            textSummary += `   Price: ₦${itemSubtotal.toLocaleString()}\n\n`;
+        });
 
-    textSummary += `━━━━━━━━━━━━━━━━━━━━\n`;
-    textSummary += `*TOTAL PAID: ₦${total.toLocaleString()}*\n`;
-    textSummary += `━━━━━━━━━━━━━━━━━━━━\n\n`;
-    textSummary += `✅ _I have successfully transferred the funds._\n`;
-    textSummary += `_Please verify and process my order._`;
+        textSummary += `━━━━━━━━━━━━━━━━━━━━\n`;
+        textSummary += `*TOTAL PAID: ₦${runningTotal.toLocaleString()}*\n`;
+        textSummary += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+        textSummary += `✅ _I have successfully transferred the funds._\n`;
+        textSummary += `_Please verify and process my order._`;
 
-    document.getElementById('finalTotal').innerText = `₦${total.toLocaleString()}`;
+        document.getElementById('finalTotal').innerText = `₦${runningTotal.toLocaleString()}`;
+    }
 
-    document.getElementById('payMadeBtn').addEventListener('click', function() {
-        if(total === 0) {
-            alert("No items in cart to process.");
+    document.getElementById('payMadeBtn').addEventListener('click', async function() {
+        if(runningTotal === 0) {
+            alert("No items found in your order.");
             return;
         }
-        localStorage.removeItem('mj_cart');
-        window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(textSummary)}`;
+
+        this.innerText = "RECORDING ORDER...";
+        this.style.opacity = "0.7";
+        this.disabled = true;
+
+        const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(textSummary)}`;
+
+        try {
+            // 1. Clear cart FIRST so it definitely happens
+            localStorage.removeItem('mj_cart');
+
+            // 2. Record to Firestore
+            await addDoc(collection(db, "orders"), {
+                orderID: receiptID,
+                totalAmount: runningTotal,
+                customerCart: cart,
+                status: "Pending Verification",
+                createdAt: serverTimestamp()
+            });
+
+            // 3. Redirect
+            window.location.replace(waUrl);
+
+        } catch (error) {
+            console.error("Firestore Error:", error);
+            // Even if Firebase fails, we must clear cart and send to WhatsApp
+            localStorage.removeItem('mj_cart');
+            window.location.replace(waUrl);
+        }
     });
 
-    function copyAcc() {
+    window.copyAcc = function() {
         const num = document.getElementById('accNum').innerText;
-        navigator.clipboard.writeText(num);
-        alert("Account number copied!");
+        navigator.clipboard.writeText(num).then(() => {
+            alert("Account number copied!");
+        }).catch(err => {
+            const textArea = document.createElement("textarea");
+            textArea.value = num;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert("Account number copied!");
+        });
     }
 </script>
 

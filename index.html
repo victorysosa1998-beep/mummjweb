@@ -40,7 +40,6 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
 }
 .nav-left { display: flex; align-items: center; gap: 15px; }
 
-/* LOGO IMAGE STYLING */
 .logo-img { 
     height: 55px; 
     width: auto; 
@@ -61,15 +60,17 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
 .icon-circle.border { border: 1px solid #ddd; }
 .icon-circle.blue { background: var(--blue); }
 
-/* CART BADGE */
-.cart-count {
+/* BADGES (CART & FAV) */
+.cart-count, .fav-count {
     position: absolute; top: -5px; right: -5px; background: #ff3b30; color: white;
     font-size: 10px; font-weight: 800; width: 18px; height: 18px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; border: 2px solid white;
+    display: none; align-items: center; justify-content: center; border: 2px solid white;
 }
 
 /* --- MOBILE DRAWER --- */
-.menu-toggle { display: none; font-size: 24px; cursor: pointer; }
+.menu-toggle { display: block; font-size: 24px; cursor: pointer; }
+@media (min-width: 769px) { .menu-toggle { display: none; } }
+
 .drawer {
     position: fixed; top: 0; left: -300px; width: 300px; height: 100%;
     background: white; z-index: 1100; transition: 0.4s; padding: 40px 20px;
@@ -82,7 +83,7 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
 }
 .drawer-overlay.active { display: block; }
 .drawer h3 { margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-.drawer-link { display: block; padding: 15px 0; text-decoration: none; color: var(--navy); font-weight: 600; border-bottom: 1px solid #f9f9f9; }
+.drawer-link { display: block; padding: 15px 0; text-decoration: none; color: var(--navy); font-weight: 600; border-bottom: 1px solid #f9f9f9; cursor: pointer; }
 .drawer-admin { color: var(--blue); border-top: 1px solid #eee; margin-top: 20px; }
 
 /* --- HERO SECTION --- */
@@ -142,26 +143,33 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
 .products-section h2 { font-family: 'Playfair Display'; font-size: 32px; margin-bottom: 40px; animation-delay: 0.7s; }
 .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
 
-/* MODIFIED CARD STYLE FOR OUT OF STOCK */
 .card { cursor: pointer; background: #fff; position: relative; text-decoration: none; color: inherit; display: block; }
 .card.out-of-stock { cursor: default; }
 .card.out-of-stock .img-placeholder { opacity: 0.6; filter: grayscale(0.5); }
 
 .img-placeholder { width: 100%; aspect-ratio: 1/1; border-radius: 20px; background: var(--bg-card); transition: 0.4s; overflow: hidden; background-size: cover; background-position: center; position: relative; }
 
-/* STOCK OVERLAY */
 .stock-overlay {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
     background: var(--navy); color: white; padding: 10px 20px; border-radius: 30px;
     font-weight: 800; font-size: 12px; white-space: nowrap; z-index: 4;
 }
 
-.fav-btn { position: absolute; top: 15px; right: 15px; background: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; z-index: 5; }
+.fav-btn { position: absolute; top: 15px; right: 15px; background: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; z-index: 5; transition: 0.3s; }
+.fav-btn.active svg { fill: #ff3b30; stroke: #ff3b30; }
+
 .card h3 { margin-top: 15px; font-size: 16px; font-weight: 700; }
 .price { font-size: 15px; color: var(--blue); font-weight: 800; margin-top: 5px; }
 .price.sold-out { color: #999; }
 
-/* PAGINATION BUTTON */
+.old-price {
+    text-decoration: line-through;
+    color: #ff3b30;
+    font-size: 13px;
+    margin-right: 8px;
+    font-weight: 400;
+}
+
 .pagination-container { text-align: center; margin-top: 50px; }
 .btn-more { 
     background: transparent; border: 2px solid var(--blue); color: var(--blue);
@@ -170,7 +178,6 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
 }
 .btn-more:hover { background: var(--blue); color: #fff; }
 
-/* NO RESULTS */
 .no-results {
     grid-column: 1 / -1; text-align: center; padding: 50px;
     font-size: 20px; font-weight: 600; color: #999;
@@ -182,7 +189,7 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
     color: #fff;
     padding: 80px 5% 40px;
     margin-top: 80px;
-    animation-delay: 1.2s;
+    animation-delay: 1s;
 }
 
 .footer-grid {
@@ -193,15 +200,8 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
     margin: 0 auto;
 }
 
-.footer-brand .footer-logo {
-    margin-bottom: 20px;
-    display: block;
-}
-
-.footer-logo-img {
-    height: 60px;
-    width: auto;
-}
+.footer-brand .footer-logo { margin-bottom: 20px; display: block; }
+.footer-logo-img { height: 60px; width: auto; object-fit: contain; }
 
 .footer-brand p {
     color: #A9C0FF;
@@ -241,6 +241,7 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
     display: flex; align-items: center; justify-content: center;
     transition: 0.3s;
     color: #fff;
+    text-decoration: none;
 }
 .social-icon:hover { background: var(--blue); transform: translateY(-3px); }
 
@@ -253,7 +254,7 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
     font-size: 14px;
 }
 
-/* --- ANIMATED WHATSAPP FLOAT --- */
+/* --- WHATSAPP FLOAT --- */
 .whatsapp-float { 
     position: fixed; 
     bottom: 30px; 
@@ -292,6 +293,34 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
     border: 2px solid white;
 }
 
+/* --- DASHBOARD STYLES --- */
+.dashboard-modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8); z-index: 3000; display: none;
+    align-items: center; justify-content: center;
+}
+.dashboard-content {
+    background: white; padding: 40px; border-radius: 25px; width: 95%; max-width: 600px;
+    position: relative; text-align: center; max-height: 90vh; overflow-y: auto;
+}
+.stat-box {
+    background: var(--bg-card); padding: 20px; border-radius: 15px; margin: 10px 0;
+}
+.stat-box h3 { font-size: 32px; color: var(--blue); margin-top: 5px; }
+
+/* ORDER HISTORY SPECIFIC STYLES */
+.clickable-stat { cursor: pointer; transition: 0.3s; border: 1px solid transparent; }
+.clickable-stat:hover { border-color: var(--blue); transform: scale(1.02); }
+
+.order-history-view { display: none; text-align: left; }
+.order-filter-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.order-filter-bar input { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #ddd; }
+
+.order-item-card { background: #f9f9f9; border-radius: 15px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--blue); }
+.order-header { display: flex; justify-content: space-between; font-weight: 800; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px; }
+.order-details-list { font-size: 14px; color: #555; }
+.order-details-list div { margin-bottom: 4px; }
+
 @keyframes breathe {
     0% { transform: scale(1); box-shadow: 0 0 0 0px rgba(37, 211, 102, 0.5); }
     50% { transform: scale(1.08); box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
@@ -321,19 +350,60 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
 <div class="drawer-overlay" id="overlay"></div>
 <div class="drawer" id="drawer">
     <h3>Categories</h3>
-    <a href="#collection" class="drawer-link" onclick="toggleDrawer()">New Arrivals</a>
-    <a href="#collection" class="drawer-link" onclick="toggleDrawer()">Handbags</a>
-    <a href="#collection" class="drawer-link" onclick="toggleDrawer()">Wallets</a>
-    <a href="#collection" class="drawer-link" onclick="toggleDrawer()">Accessories</a>
+    <a class="drawer-link" onclick="handleDrawerFilter('all')">New Arrivals</a>
+    <a class="drawer-link" onclick="handleDrawerFilter('Handbags')">Handbags</a>
+    <a class="drawer-link" onclick="handleDrawerFilter('Wallets')">Wallets</a>
+    <a class="drawer-link" onclick="handleDrawerFilter('Accessories')">Accessories</a>
+    <a href="javascript:void(0)" id="dashboardLink" class="drawer-link" style="display: none;" onclick="openDashboard()">Store Dashboard</a>
     <a href="upload.html" id="uploadLink" class="drawer-link" style="display: none;" onclick="toggleDrawer()">Upload Products</a>
     <a href="login.html" id="loginLink" class="drawer-link drawer-admin" onclick="toggleDrawer()">Admin Login</a>
     <a href="#" id="logoutBtn" class="drawer-link drawer-admin" style="display: none;" onclick="handleLogout()">Logout</a>
 </div>
 
+<div id="adminDashboard" class="dashboard-modal">
+    <div class="dashboard-content">
+        <button onclick="closeDashboard()" style="position:absolute; top:15px; right:15px; border:none; background:none; font-size:24px; cursor:pointer;">&times;</button>
+        
+        <div id="mainStatsView">
+            <h2 style="font-family:'Playfair Display'; margin-bottom:20px;">Store Analytics</h2>
+            <div class="stat-box">
+                <p>Total Visitors</p>
+                <h3 id="statVisitors">...</h3>
+            </div>
+            <div class="stat-box clickable-stat" onclick="showOrderHistory()">
+                <p>Successful Orders (Click to View)</p>
+                <h3 id="statOrders">...</h3>
+            </div>
+            <button onclick="closeDashboard()" style="width:100%; margin-top:20px; background:var(--navy); color:white; padding:12px; border:none; border-radius:10px; cursor:pointer;">Close</button>
+        </div>
+
+        <div id="orderHistoryView" class="order-history-view">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+                <button onclick="backToStats()" style="border:none; background:#eee; padding:8px 12px; border-radius:8px; cursor:pointer;">← Back</button>
+                <h2 style="font-family:'Playfair Display';">Order History</h2>
+            </div>
+
+            <div class="order-filter-bar">
+                <input type="date" id="orderDateFilter" onchange="filterOrders()">
+                <input type="text" id="orderSearch" placeholder="Search Order ID..." onkeyup="filterOrders()">
+            </div>
+
+            <div style="margin-bottom:15px; font-weight:700; color:var(--blue);">
+                Total Filtered Sales: <span id="filteredSalesTotal">₦0</span>
+            </div>
+
+            <div id="ordersListContainer">
+                </div>
+        </div>
+    </div>
+</div>
+
 <header class="navbar animate">
     <div class="nav-left">
         <div class="menu-toggle" onclick="toggleDrawer()">☰</div>
-        <img src="video/mjlogo1.png" alt="Mummy J Logo" class="logo-img">
+        <a href="index.html">
+            <img src="video/mjlogo1.png" alt="Mummy J Logo" class="logo-img">
+        </a>
     </div>
     <div class="actions">
         <div class="search-wrapper">
@@ -346,8 +416,9 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
             <div id="cartCounter" class="cart-count">0</div>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         </a>
-        <a href="profile.html" class="icon-circle blue">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <a href="favorites.html" class="icon-circle blue">
+            <div id="favCounter" class="fav-count">0</div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.84-8.84 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
         </a>
     </div>
 </header>
@@ -393,8 +464,7 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
             </div>
         </div>
 
-        <div class="product-grid" id="productGrid">
-        </div>
+        <div class="product-grid" id="productGrid"></div>
 
         <div class="pagination-container animate" id="pagination">
             <button class="btn-more" onclick="showNextPage()">Show More</button>
@@ -409,11 +479,18 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
 <footer class="site-footer animate">
     <div class="footer-grid">
         <div class="footer-brand">
+            <a href="index.html" class="footer-logo">
+                <img src="video/mjlogo1.png" alt="Mummy J Logo" class="footer-logo-img">
+            </a>
             <p>Your premier destination for high-end luxury handbags and accessories. We curate the finest collection to help you express your unique style.</p>
             <div class="social-links">
                 <a href="#" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
                 <a href="#" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
-                <a href="#" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12a4 4 0 1 0 4 4V4h5a2 2 0 0 0 2-2 2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v10Z"></path></svg></a>
+                <a href="#" class="social-icon">
+                    <svg width="20" height="20" viewBox="0 0 448 512" fill="currentColor">
+                        <path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z"/>
+                    </svg>
+                </a>
             </div>
         </div>
 
@@ -429,18 +506,19 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
 
         <div class="footer-contact">
             <h4>Support</h4>
-            <p><strong>Email:</strong> support@mummyjemporium.com</p>
-            <p><strong>Location:</strong> Edo State, Nigeria</p>
+            <p><strong>Email:</strong> mummyjemporium@gmail.com</p>
+            <p><strong>Location:</strong> Benin city, Edo State, Nigeria</p>
         </div>
     </div>
     <div class="footer-bottom">
         <p>© 2026 Mummy J Emporium. All Rights Reserved.</p>
+        <p>Built with immense love ❤️ by Sasatech.</p>
     </div>
 </footer>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, query, orderBy, getCountFromServer, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
   const firebaseConfig = {
@@ -458,26 +536,129 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
   const auth = getAuth(app);
 
   const ADMIN_UID = "tPgPOqy3aPU4HeIAvWm6t64N3hG3";
+  let ALL_ORDERS = [];
 
   onAuthStateChanged(auth, (user) => {
       const uploadLink = document.getElementById('uploadLink');
+      const dashboardLink = document.getElementById('dashboardLink');
       const loginLink = document.getElementById('loginLink');
       const logoutBtn = document.getElementById('logoutBtn');
 
       if (user && user.uid === ADMIN_UID) {
           uploadLink.style.display = 'block';
+          dashboardLink.style.display = 'block';
           loginLink.style.display = 'none';
           logoutBtn.style.display = 'block';
       } else if (user) {
           uploadLink.style.display = 'none';
+          dashboardLink.style.display = 'none';
           loginLink.style.display = 'none';
           logoutBtn.style.display = 'block';
       } else {
           uploadLink.style.display = 'none';
+          dashboardLink.style.display = 'none';
           loginLink.style.display = 'block';
           logoutBtn.style.display = 'none';
       }
   });
+
+  /* --- DASHBOARD LOGIC --- */
+  window.openDashboard = async function() {
+      document.getElementById('adminDashboard').style.display = 'flex';
+      toggleDrawer(); 
+      backToStats();
+      
+      try {
+          const visitorSnap = await getCountFromServer(collection(db, "visitors"));
+          const orderSnap = await getCountFromServer(collection(db, "orders"));
+          
+          document.getElementById('statVisitors').innerText = visitorSnap.data().count;
+          document.getElementById('statOrders').innerText = orderSnap.data().count;
+
+          // Fetch actual orders for history view
+          const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+          const snap = await getDocs(q);
+          ALL_ORDERS = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      } catch (e) {
+          console.error("Error fetching stats:", e);
+      }
+  }
+
+  window.closeDashboard = function() {
+      document.getElementById('adminDashboard').style.display = 'none';
+  }
+
+  window.showOrderHistory = function() {
+      document.getElementById('mainStatsView').style.display = 'none';
+      document.getElementById('orderHistoryView').style.display = 'block';
+      filterOrders();
+  }
+
+  window.backToStats = function() {
+      document.getElementById('mainStatsView').style.display = 'block';
+      document.getElementById('orderHistoryView').style.display = 'none';
+  }
+
+  window.filterOrders = function() {
+      const dateVal = document.getElementById('orderDateFilter').value;
+      const searchVal = document.getElementById('orderSearch').value.toLowerCase();
+      const container = document.getElementById('ordersListContainer');
+      
+      let filtered = ALL_ORDERS.filter(o => {
+          const orderID = (o.orderID || "").toLowerCase();
+          const matchesSearch = orderID.includes(searchVal);
+          
+          let matchesDate = true;
+          if(dateVal && o.createdAt) {
+              const orderDate = o.createdAt.toDate().toISOString().split('T')[0];
+              matchesDate = orderDate === dateVal;
+          }
+          return matchesSearch && matchesDate;
+      });
+
+      let totalSales = 0;
+      container.innerHTML = filtered.map(o => {
+          totalSales += (o.totalAmount || 0);
+          const dateStr = o.createdAt ? o.createdAt.toDate().toLocaleString() : "N/A";
+          
+          let itemsHtml = (o.customerCart || []).map(item => `
+              <div>• ${item.name} (${item.color || 'Default'}) x${item.qty || 1} - ₦${Number(item.price).toLocaleString()}</div>
+          `).join('');
+
+          return `
+              <div class="order-item-card">
+                  <div class="order-header">
+                      <span>ID: ${o.orderID || 'N/A'}</span>
+                      <span>₦${Number(o.totalAmount).toLocaleString()}</span>
+                  </div>
+                  <div class="order-details-list">
+                      <div style="font-weight:700; color:#666;">Date: ${dateStr}</div>
+                      ${itemsHtml}
+                      <div style="margin-top:5px; font-style:italic; font-size:12px;">Status: ${o.status || 'Pending'}</div>
+                  </div>
+              </div>
+          `;
+      }).join('');
+
+      if(filtered.length === 0) container.innerHTML = "<p style='text-align:center; color:#999;'>No orders found.</p>";
+      document.getElementById('filteredSalesTotal').innerText = `₦${totalSales.toLocaleString()}`;
+  }
+
+  /* --- VISITOR TRACKING --- */
+  async function trackVisitor() {
+      if (!sessionStorage.getItem('mj_visited')) {
+          try {
+              await addDoc(collection(db, "visitors"), {
+                  timestamp: serverTimestamp(),
+                  userAgent: navigator.userAgent
+              });
+              sessionStorage.setItem('mj_visited', 'true');
+          } catch (e) {
+              console.error("Tracking error:", e);
+          }
+      }
+  }
 
   window.handleLogout = function() {
       signOut(auth).then(() => {
@@ -507,13 +688,21 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
 
   window.handleSearch = function() { applyFilters(); }
 
+  window.handleDrawerFilter = function(category) {
+      document.getElementById('catFilter').value = category;
+      toggleDrawer(); 
+      applyFilters(); 
+      window.location.href = "#collection"; 
+  }
+
   window.applyFilters = function() {
       const searchTerm = document.getElementById('searchInput').value.toLowerCase();
       const catValue = document.getElementById('catFilter').value;
       const sortValue = document.getElementById('priceSort').value;
 
       filteredItems = ALL_PRODUCTS.filter(item => {
-          const matchesSearch = item.name.toLowerCase().includes(searchTerm);
+          const name = item.name ? item.name.toLowerCase() : "";
+          const matchesSearch = name.includes(searchTerm);
           const matchesCat = catValue === 'all' || item.category === catValue;
           return matchesSearch && matchesCat;
       });
@@ -528,6 +717,7 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
   function renderGrid() {
       const grid = document.getElementById('productGrid');
       const pagination = document.getElementById('pagination');
+      const favs = JSON.parse(localStorage.getItem('mj_favs')) || [];
       
       if (filteredItems.length === 0) {
           grid.innerHTML = `<div class="no-results">No results found.</div>`;
@@ -540,10 +730,12 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
 
       grid.innerHTML = itemsToDisplay.map((item, index) => {
           const isOutOfStock = item.inStock === false;
-          
+          const isFav = favs.some(f => f.id === item.id);
+          const oldPriceHtml = item.oldPrice ? `<span class="old-price">₦${Number(item.oldPrice).toLocaleString()}</span>` : '';
+
           return `
               <div class="card animate ${isOutOfStock ? 'out-of-stock' : ''}" style="animation-delay: ${0.1 * (index % itemsPerPage)}s">
-                  <button class="fav-btn">
+                  <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite('${item.id}', event)">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.84-8.84 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                   </button>
                   <a href="${isOutOfStock ? 'javascript:void(0)' : 'product-details.html?id=' + item.id}">
@@ -553,13 +745,24 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
                   </a>
                   <h3>${item.name}</h3>
                   <p class="price ${isOutOfStock ? 'sold-out' : ''}">
-                      ${isOutOfStock ? 'Out of Stock' : '₦' + Number(item.price).toLocaleString()}
+                      ${isOutOfStock ? 'Out of Stock' : oldPriceHtml + '₦' + Number(item.price).toLocaleString()}
                   </p>
               </div>
           `;
       }).join('');
 
       pagination.style.display = endIdx < filteredItems.length ? 'block' : 'none';
+  }
+
+  window.toggleFavorite = function(id, event) {
+      event.preventDefault();
+      const item = ALL_PRODUCTS.find(p => p.id === id);
+      let favs = JSON.parse(localStorage.getItem('mj_favs')) || [];
+      const index = favs.findIndex(f => f.id === id);
+      if (index > -1) { favs.splice(index, 1); } else { favs.push(item); }
+      localStorage.setItem('mj_favs', JSON.stringify(favs));
+      updateFavBadge();
+      renderGrid(); 
   }
 
   window.showNextPage = function() {
@@ -589,9 +792,20 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
       }
   }
 
+  function updateFavBadge() {
+      const favs = JSON.parse(localStorage.getItem('mj_favs')) || [];
+      const badge = document.getElementById('favCounter');
+      if(badge) {
+          badge.innerText = favs.length;
+          badge.style.display = favs.length > 0 ? "flex" : "none";
+      }
+  }
+
   window.addEventListener('load', () => {
       updateCartBadge();
+      updateFavBadge();
       loadProducts();
+      trackVisitor(); 
   });
 </script>
 

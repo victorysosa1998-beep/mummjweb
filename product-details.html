@@ -41,26 +41,59 @@
         .main-img-container {
             background: var(--bg-card);
             border-radius: 35px;
-            padding: 60px;
+            padding: 40px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 500px;
             position: relative;
+            overflow: hidden;
         }
 
-        #displayImg {
+        .image-carousel {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
             width: 100%;
+            gap: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .image-carousel::-webkit-scrollbar { display: none; }
+
+        .image-carousel img {
+            width: 100%;
+            flex-shrink: 0;
             max-height: 500px;
             object-fit: contain;
+            scroll-snap-align: center;
             transition: 0.3s;
-            opacity: 0; 
         }
+
+        .carousel-dots {
+            display: flex;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ccc;
+            transition: 0.3s;
+        }
+        .dot.active { background: var(--blue); width: 20px; border-radius: 10px; }
 
         .product-info { position: sticky; top: 140px; height: fit-content; }
         .brand-label { color: var(--blue); font-weight: 700; letter-spacing: 2px; font-size: 12px; margin-bottom: 10px; display: block; }
         .product-title { font-family: 'Anton', sans-serif; font-size: 48px; line-height: 1.1; margin-bottom: 15px; }
-        .product-price { font-size: 32px; font-weight: 800; color: var(--navy); margin-bottom: 20px; }
+        
+        /* PRICE STYLING */
+        .price-wrapper { display: flex; align-items: baseline; gap: 15px; margin-bottom: 20px; }
+        .product-price { font-size: 32px; font-weight: 800; color: var(--navy); }
+        .old-price { font-size: 20px; color: var(--danger); text-decoration: line-through; font-weight: 600; opacity: 0.8; }
 
         .product-description {
             font-size: 15px;
@@ -102,16 +135,40 @@
         }
 
         .buy-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 30px; }
-        .btn-atc { background: var(--navy); color: white; border: none; padding: 20px; border-radius: 15px; font-weight: 700; cursor: pointer; }
-        .btn-whatsapp { background: #25d366; color: white; text-align: center; padding: 20px; border-radius: 15px; text-decoration: none; font-weight: 700; }
+        .btn-atc { background: var(--navy); color: white; border: none; padding: 20px; border-radius: 15px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .btn-atc:hover:not(:disabled) { transform: translateY(-2px); opacity: 0.9; }
+        .btn-whatsapp { background: #25d366; color: white; text-align: center; padding: 20px; border-radius: 15px; text-decoration: none; font-weight: 700; transition: 0.3s; }
+        .btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3); }
 
+        /* --- ADMIN PANEL --- */
         #adminControls {
             margin-top: 40px; padding: 25px; background: #fff; 
             border: 3px solid #000; border-radius: 25px; display: none; 
         }
         .admin-header { font-size: 14px; font-weight: 900; color: #000; margin-bottom: 15px; display: block; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        
+        .admin-input-group { margin-bottom: 15px; }
+        .admin-input-group label { display: block; font-size: 11px; font-weight: 800; margin-bottom: 5px; color: #666; }
+        .admin-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-family: 'Inter'; font-weight: 600; }
+        
         .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; margin-bottom: 15px; }
+        .btn-save { width: 100%; background: var(--blue); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
         .btn-del { width: 100%; background: #fff; color: var(--danger); border: 1px solid var(--danger); padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+
+        .admin-image-manager { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+        .image-edit-list { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 10px; }
+        .image-edit-card { position: relative; flex-shrink: 0; width: 80px; height: 80px; border-radius: 10px; overflow: hidden; border: 1px solid #ddd; }
+        .image-edit-card img { width: 100%; height: 100%; object-fit: cover; }
+        .del-img-btn { position: absolute; top: 2px; right: 2px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        
+        #replacementUrlField { 
+            margin-top: 10px; 
+            padding: 15px; 
+            background: #f9f9f9; 
+            border-radius: 12px; 
+            border: 1px solid #eee;
+            display: none; 
+        }
 
         .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -120,30 +177,27 @@
         input:checked + .slider { background-color: var(--success); }
         input:checked + .slider:before { transform: translateX(24px); }
 
-        .debug-btn { position: fixed; bottom: 10px; left: 10px; font-size: 10px; opacity: 0.3; background: #000; color: #fff; border: none; padding: 5px; cursor: pointer; }
+        /* --- SUCCESS OVERLAY --- */
+        #successOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(18, 37, 107, 0.95); backdrop-filter: blur(10px);
+            z-index: 3000; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; color: white;
+            opacity: 0; visibility: hidden; transition: 0.4s ease;
+        }
+        #successOverlay.active { opacity: 1; visibility: visible; }
+        .success-content { text-align: center; transform: scale(0.8); transition: 0.5s; }
+        #successOverlay.active .success-content { transform: scale(1); }
+        .checkmark-circle { width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 25px; }
+        .checkmark-circle svg { width: 60px; height: 60px; color: var(--navy); }
+        .success-text { font-family: 'Anton', sans-serif; font-size: 32px; text-transform: uppercase; }
 
-        /* --- MOBILE RESPONSIVENESS --- */
         @media (max-width: 992px) {
             body { padding-top: 80px; }
-            .product-wrapper {
-                grid-template-columns: 1fr; /* Stack elements vertically */
-                gap: 30px;
-                padding: 20px 0;
-            }
-            .main-img-container {
-                min-height: 350px;
-                padding: 30px;
-                border-radius: 25px;
-            }
-            #displayImg {
-                max-height: 350px;
-            }
-            .product-info {
-                position: static; /* Remove sticky on mobile */
-            }
-            .product-title {
-                font-size: 36px;
-            }
+            .product-wrapper { grid-template-columns: 1fr; gap: 30px; padding: 20px 0; }
+            .main-img-container { min-height: 350px; padding: 20px; }
+            .product-info { position: static; }
+            .product-title { font-size: 36px; }
         }
     </style>
 </head>
@@ -153,16 +207,33 @@
     <a href="index.html"><img src="video/mjlogo1.png" alt="Logo" class="logo-img"></a>
 </header>
 
+<div id="successOverlay">
+    <div class="success-content">
+        <div class="checkmark-circle">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+            </svg>
+        </div>
+        <div class="success-text" id="overlayTitle">SUCCESS</div>
+        <div class="success-subtext" id="overlaySub">Action completed</div>
+    </div>
+</div>
+
 <main class="container">
     <div class="product-wrapper">
         <div class="main-img-container">
-            <img id="displayImg" src="" alt="Product">
+            <div class="image-carousel" id="imageCarousel"></div>
+            <div class="carousel-dots" id="carouselDots"></div>
         </div>
 
         <div class="product-info">
             <span class="brand-label" id="catLabel">COLLECTION</span>
             <h1 id="pName" class="product-title">Loading...</h1>
-            <p id="pPrice" class="product-price">₦0</p>
+            
+            <div class="price-wrapper">
+                <span id="pPrice" class="product-price">₦0</span>
+                <span id="pOldPrice" class="old-price" style="display:none;">₦0</span>
+            </div>
             
             <div id="pDesc" class="product-description"></div>
 
@@ -180,25 +251,53 @@
 
             <div id="adminControls">
                 <span class="admin-header">MUMMY J ADMIN PANEL</span>
+                
+                <div class="admin-input-group">
+                    <label>Product Name</label>
+                    <input type="text" id="editName" class="admin-input">
+                </div>
+
+                <div class="admin-input-group">
+                    <label>New Price (₦)</label>
+                    <input type="number" id="editPrice" class="admin-input">
+                </div>
+
+                <div class="admin-input-group">
+                    <label>Description</label>
+                    <textarea id="editDesc" class="admin-input" rows="4" style="resize:none;"></textarea>
+                </div>
+
                 <div class="toggle-row">
-                    <span style="font-weight:700; font-size:14px;">Toggle In-Stock Status</span>
+                    <span style="font-weight:700; font-size:14px;">In-Stock Status</span>
                     <label class="switch">
-                        <input type="checkbox" id="stockToggle" onchange="handleStockUpdate(this.checked)">
+                        <input type="checkbox" id="stockToggle">
                         <span class="slider"></span>
                     </label>
                 </div>
-                <button class="btn-del" onclick="handleDelete()">Delete Product</button>
+
+                <div class="admin-image-manager">
+                    <label class="selector-label">MANAGE IMAGES</label>
+                    <div class="image-edit-list" id="adminImageList"></div>
+                    
+                    <div id="replacementUrlField">
+                        <label class="selector-label">REPLACE WITH NEW IMAGE URL</label>
+                        <input type="text" id="newImgUrl" class="admin-input" placeholder="Paste image link here...">
+                        <button class="btn-save" style="margin-top:10px; padding: 10px; font-size: 12px;" onclick="addNewImageUrl()">ADD URL TO GALLERY</button>
+                    </div>
+                </div>
+
+                <button class="btn-save" onclick="handleUpdateProduct()" id="saveBtn">SAVE ALL CHANGES</button>
+                <button class="btn-del" onclick="handleDelete()">DELETE PRODUCT</button>
             </div>
         </div>
     </div>
 </main>
 
-<button class="debug-btn" onclick="checkUID()">Debug Login</button>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getStorage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlGgRRrPP67b7EHyYm_eL1R08zFi08aLg",
@@ -212,16 +311,20 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
+    const storage = getStorage(app);
 
     const ADMIN_UID = "tPgPOqy3aPU4HeIAvWm6t64N3hG3";
     const pid = new URLSearchParams(window.location.search).get('id');
     let productData = null;
     let selectedColor = "Default";
+    let tempImages = [];
 
-    window.checkUID = () => {
-        const user = auth.currentUser;
-        if(user) alert("Your UID: " + user.uid);
-        else alert("No user logged in.");
+    window.triggerSuccess = (title, sub) => {
+        const overlay = document.getElementById('successOverlay');
+        document.getElementById('overlayTitle').innerText = title || "SUCCESS";
+        document.getElementById('overlaySub').innerText = sub || "Action completed";
+        overlay.classList.add('active');
+        setTimeout(() => overlay.classList.remove('active'), 2000);
     };
 
     function checkAdminStatus() {
@@ -229,6 +332,20 @@
         const panel = document.getElementById('adminControls');
         if (panel && user && user.uid === ADMIN_UID) {
             panel.style.display = 'block';
+            if(productData) {
+                document.getElementById('editName').value = productData.name;
+                document.getElementById('editPrice').value = productData.price;
+                document.getElementById('editDesc').value = productData.description || "";
+                document.getElementById('stockToggle').checked = productData.inStock !== false;
+                
+                tempImages = [...(productData.images || [])];
+                renderAdminImages();
+
+                // Logic to keep the URL field visible if an image was previously deleted
+                if(productData.imagesDeleted === true) {
+                    document.getElementById('replacementUrlField').style.display = 'block';
+                }
+            }
         }
     }
 
@@ -241,17 +358,23 @@
             if (snap.exists()) {
                 productData = snap.data();
                 renderProduct();
-            } else {
-                alert("Product not found.");
+                checkAdminStatus(); 
             }
-        } catch (error) {
-            console.error("Error fetching product:", error);
-        }
+        } catch (error) { console.error(error); }
     }
 
     function renderProduct() {
         document.getElementById('pName').innerText = productData.name;
         document.getElementById('pPrice').innerText = "₦" + Number(productData.price).toLocaleString();
+        
+        const oldPriceEl = document.getElementById('pOldPrice');
+        if (productData.oldPrice && productData.oldPrice > productData.price) {
+            oldPriceEl.innerText = "₦" + Number(productData.oldPrice).toLocaleString();
+            oldPriceEl.style.display = "inline";
+        } else {
+            oldPriceEl.style.display = "none";
+        }
+
         document.getElementById('catLabel').innerText = productData.category || "COLLECTION";
         document.getElementById('pDesc').innerText = productData.description || "";
         
@@ -259,26 +382,26 @@
         const badge = document.getElementById('stockBadge');
         badge.innerText = isStock ? "In Stock" : "Out of Stock";
         badge.className = `stock-status-badge ${isStock ? 'status-in' : 'status-out'}`;
-        document.getElementById('stockToggle').checked = isStock;
         
+        const atc = document.getElementById('atcBtn');
         if(!isStock) {
-            const atc = document.getElementById('atcBtn');
             atc.disabled = true;
             atc.innerText = "SOLD OUT";
             atc.style.opacity = "0.5";
+        } else {
+            atc.disabled = false;
+            atc.innerText = "ADD TO CART";
+            atc.style.opacity = "1";
         }
 
         const grid = document.getElementById('colorGrid');
         grid.innerHTML = ""; 
-
         if (productData.colors && productData.colors.length > 0) {
             document.getElementById('colorArea').style.display = 'block';
             productData.colors.forEach((c, i) => {
                 const sw = document.createElement('div');
                 sw.className = `color-swatch ${i===0 ? 'active' : ''}`;
                 sw.style.backgroundColor = c.hex || "#ddd";
-                sw.title = c.name;
-
                 sw.onclick = () => {
                     document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
                     sw.classList.add('active');
@@ -289,55 +412,125 @@
             });
             selectedColor = productData.colors[0].name;
         }
-        
-        changeImage(productData.img || productData.image);
+        setupImages();
         updateWA();
     }
 
-    function changeImage(src) {
-        const img = document.getElementById('displayImg');
-        if(!src) {
-            img.style.opacity = "1";
-            return;
-        }
-        img.style.opacity = "0";
-        setTimeout(() => {
+    function renderAdminImages() {
+        const list = document.getElementById('adminImageList');
+        list.innerHTML = "";
+        
+        tempImages.forEach((src, index) => {
+            const card = document.createElement('div');
+            card.className = "image-edit-card";
+            
+            const img = document.createElement('img');
             img.src = src;
-            img.style.opacity = "1";
-        }, 200);
+            
+            const delBtn = document.createElement('button');
+            delBtn.className = "del-img-btn";
+            delBtn.innerHTML = "&times;";
+            delBtn.onclick = () => removeImage(index);
+            
+            card.appendChild(img);
+            card.appendChild(delBtn);
+            list.appendChild(card);
+        });
     }
 
-    window.handleStockUpdate = async (val) => {
-        try {
-            await updateDoc(doc(db, "products", pid), { inStock: val });
-            location.reload();
-        } catch(e) { alert("Error: " + e.message); }
+    window.removeImage = (index) => {
+        if(confirm("Remove this image? The URL field will remain open for you to add new links.")) {
+            tempImages.splice(index, 1);
+            renderAdminImages();
+            // Show the URL replacement field
+            document.getElementById('replacementUrlField').style.display = 'block';
+        }
     };
 
+    window.addNewImageUrl = () => {
+        const urlInput = document.getElementById('newImgUrl');
+        const url = urlInput.value.trim();
+        
+        if(url) {
+            tempImages.push(url);
+            urlInput.value = "";
+            renderAdminImages();
+        } else {
+            alert("Please enter a valid image URL.");
+        }
+    };
+
+    window.handleUpdateProduct = async () => {
+        const newName = document.getElementById('editName').value;
+        const newPrice = Number(document.getElementById('editPrice').value);
+        const newDesc = document.getElementById('editDesc').value;
+        const newStock = document.getElementById('stockToggle').checked;
+        const urlFieldVisible = document.getElementById('replacementUrlField').style.display === 'block';
+
+        let updatePayload = {
+            name: newName,
+            description: newDesc,
+            inStock: newStock,
+            images: tempImages,
+            img: tempImages.length > 0 ? tempImages[0] : (productData.img || ""),
+            imagesDeleted: urlFieldVisible // Persist the state that an image was removed
+        };
+
+        if (newPrice !== productData.price) {
+            updatePayload.oldPrice = productData.price;
+            updatePayload.price = newPrice;
+        }
+
+        try {
+            await updateDoc(doc(db, "products", pid), updatePayload);
+            triggerSuccess("UPDATED", "Product changes saved");
+            setTimeout(() => location.reload(), 1500);
+        } catch(e) { alert(e.message); }
+    };
+
+    function setupImages() {
+        const carousel = document.getElementById('imageCarousel');
+        const dotsContainer = document.getElementById('carouselDots');
+        let imgList = productData.images || [];
+        
+        if (imgList.length === 0 && productData.img) imgList = [productData.img];
+
+        carousel.innerHTML = imgList.map(src => `<img src="${src}" alt="Product">`).join('');
+        dotsContainer.innerHTML = imgList.map((_, i) => `<div class="dot ${i===0 ? 'active' : ''}"></div>`).join('');
+
+        carousel.onscroll = () => {
+            const index = Math.round(carousel.scrollLeft / carousel.offsetWidth);
+            document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === index));
+        };
+    }
+
     window.handleDelete = async () => {
-        if(confirm("Confirm deletion?")) {
+        if(confirm("Permanently delete this product?")) {
             await deleteDoc(doc(db, "products", pid));
-            window.location.href = "index.html";
+            triggerSuccess("DELETED", "Product removed");
+            setTimeout(() => { window.location.href = "index.html"; }, 1500);
         }
     };
 
     function updateWA() {
-        const text = `Hello Mummy J Emporium, I'm interested in:\n\n*Product:* ${productData.name}\n*Color:* ${selectedColor}\n*Price:* ₦${Number(productData.price).toLocaleString()}`;
+        const formattedPrice = "₦" + Number(productData.price).toLocaleString();
+        const text = `Hello Mummy J Emporium, I'm interested in:\n\n*Product:* ${productData.name}\n*Color:* ${selectedColor}\n*Price:* ${formattedPrice}\n\nLink: ${window.location.href}`;
         document.getElementById('waBtn').href = `https://wa.me/2348123541592?text=${encodeURIComponent(text)}`;
     }
 
     window.addToCart = () => {
-        if(!productData) return;
         let cart = JSON.parse(localStorage.getItem('mj_cart')) || [];
         cart.push({ 
             id: pid, 
             name: productData.name, 
             price: productData.price, 
             color: selectedColor, 
-            img: document.getElementById('displayImg').src 
+            img: tempImages[0] || productData.img 
         });
         localStorage.setItem('mj_cart', JSON.stringify(cart));
-        alert("Added to cart!");
+        
+        // Removed default alert; using custom success overlay only
+        triggerSuccess("ADDED", "Item added to your cart!");
     };
 
     fetchProduct();
