@@ -137,7 +137,7 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
 
 .text-block h1 { font-family: 'Anton', sans-serif; font-size: clamp(40px, 8vw, 85px); line-height: 0.9; margin-bottom: 25px; color: #fff; text-shadow: 2px 2px 10px rgba(0,0,0,0.3); position: relative; }
 .text-block p { color: #eee; font-size: 16px; margin-bottom: 35px; max-width: 450px; line-height: 1.5; font-weight: 600; position: relative; }
-.btn-main { background: var(--blue); color: #fff; text-decoration: none; padding: 18px 40px; border-radius: 35px; font-weight: 600; display: inline-block; transition: 0.3s; position: relative; }
+.btn-main { background: var(--blue); color: #fff; text-decoration: none; padding: 18px 40px; border-radius: 35px; font-weight: 600; display: inline-block; transition: 0.3s; position: relative; cursor: pointer; }
 
 .bag-bg {
     background: var(--bg-card); border-radius: 35px; padding: 40px;
@@ -157,7 +157,7 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
     50% { transform: translateY(-20px) rotate(2deg); }
 }
 
-.action-footer { display: flex; gap: 15px; width: 100%; margin-top: 20px; align-items: center; text-decoration: none; }
+.action-footer { display: flex; gap: 15px; width: 100%; margin-top: 20px; align-items: center; text-decoration: none; cursor: pointer; }
 .label-badge { background: var(--pale-blue); flex: 1; border-radius: 30px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 18px; padding: 15px; text-transform: uppercase; }
 .arrow-circle { width: 60px; height: 60px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--navy); }
 
@@ -411,12 +411,12 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
             </video>
             <h1>Unleash your Inner Style Icon</h1>
             <p>In our assortment, you will find the best handbags from global manufacturers that will help you express your unsurpassed individuality.</p>
-            <a href="#collection" class="btn-main">Start Shopping</a>
+            <a onclick="resetFiltersAndScroll()" class="btn-main">Start Shopping</a>
         </div>
 
         <div class="bag-bg animate">
             <img src="https://image2url.com/r2/default/images/1773237656775-ddc8efaf-ef07-44a1-9089-76538764820e.png" alt="Luxury Bag" class="product-img">
-            <a href="#collection" class="action-footer">
+            <a onclick="resetFiltersAndScroll()" class="action-footer">
                 <div class="label-badge">NEW COLLECTION</div>
                 <div class="arrow-circle">↗</div>
             </a>
@@ -477,10 +477,10 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
         <div class="footer-links">
             <h4>Quick Shop</h4>
             <ul>
-                <li><a href="#collection">New Arrivals</a></li>
+                <li><a onclick="resetFiltersAndScroll()">New Arrivals</a></li>
                 <li><a href="#">Best Sellers</a></li>
-                <li><a href="#collection">Handbags</a></li>
-                <li><a href="#collection">Wallets</a></li>
+                <li><a onclick="handleDrawerFilter('Handbags')">Handbags</a></li>
+                <li><a onclick="handleDrawerFilter('Wallets')">Wallets</a></li>
             </ul>
         </div>
 
@@ -594,10 +594,19 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
   window.handleSearch = function() { applyFilters(); }
 
   window.handleDrawerFilter = function(category) {
-      document.getElementById('catFilter').value = category;
+      const catSelect = document.getElementById('catFilter');
+      catSelect.value = category;
       toggleDrawer(); 
       applyFilters(); 
       window.location.href = "#collection"; 
+  }
+
+  window.resetFiltersAndScroll = function() {
+      document.getElementById('catFilter').value = 'all';
+      document.getElementById('searchInput').value = '';
+      document.getElementById('priceSort').value = 'newest';
+      applyFilters();
+      window.location.href = "#collection";
   }
 
   window.applyFilters = function() {
@@ -608,7 +617,11 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
       filteredItems = ALL_PRODUCTS.filter(item => {
           const name = item.name ? item.name.toLowerCase() : "";
           const matchesSearch = name.includes(searchTerm);
-          const matchesCat = catValue === 'all' || item.category === catValue;
+          // Fixed category logic: Case-insensitive match or 'all'
+          const itemCat = item.category ? item.category.trim().toLowerCase() : "";
+          const targetCat = catValue.toLowerCase();
+          
+          const matchesCat = catValue === 'all' || itemCat === targetCat;
           return matchesSearch && matchesCat;
       });
 
