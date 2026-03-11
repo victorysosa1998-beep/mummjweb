@@ -101,7 +101,6 @@
 
         document.getElementById('finalTotal').innerText = `₦${runningTotal.toLocaleString()}`;
     } else {
-        // If they refresh and cart is gone, alert them
         alert("Session expired or cart empty. Please return to store.");
     }
 
@@ -118,7 +117,6 @@
         const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(textSummary)}`;
 
         try {
-            // 1. Record to Firestore WITH Customer Info
             await addDoc(collection(db, "orders"), {
                 orderID: receiptID,
                 customerName: customer.name,
@@ -130,16 +128,12 @@
                 createdAt: serverTimestamp()
             });
 
-            // 2. Clear cart and customer info AFTER success
             localStorage.removeItem('mj_cart');
             localStorage.removeItem('mj_customer');
-
-            // 3. Redirect to WhatsApp
             window.location.replace(waUrl);
 
         } catch (error) {
             console.error("Firestore Error:", error);
-            // Even if Firebase fails, we clear and send WhatsApp so the sale isn't lost
             localStorage.removeItem('mj_cart');
             localStorage.removeItem('mj_customer');
             window.location.replace(waUrl);
@@ -148,16 +142,13 @@
 
     window.copyAcc = function() {
         const num = document.getElementById('accNum').innerText;
-        navigator.clipboard.writeText(num).then(() => {
-            alert("Account number copied!");
-        }).catch(err => {
+        navigator.clipboard.writeText(num).catch(err => {
             const textArea = document.createElement("textarea");
             textArea.value = num;
             document.body.appendChild(textArea);
             textArea.select();
             document.execCommand('copy');
             document.body.removeChild(textArea);
-            alert("Account number copied!");
         });
     }
 </script>
