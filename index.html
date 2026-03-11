@@ -617,7 +617,6 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
       filteredItems = ALL_PRODUCTS.filter(item => {
           const name = item.name ? item.name.toLowerCase() : "";
           const matchesSearch = name.includes(searchTerm);
-          // Fixed category logic: Case-insensitive match or 'all'
           const itemCat = item.category ? item.category.trim().toLowerCase() : "";
           const targetCat = catValue.toLowerCase();
           
@@ -688,9 +687,10 @@ body { font-family: 'Inter', sans-serif; color: var(--navy); overflow-x: hidden;
           cart.push({ ...item, quantity: 1 });
           localStorage.setItem('mj_cart', JSON.stringify(cart));
           updateCartBadge();
-          alert(`${item.name} added to cart!`);
+          // Removed alert for a smoother UI experience
       } else {
-          alert(`Item is already in your cart.`);
+          // You can also remove this alert if you want it completely silent
+          console.log("Item already in cart");
       }
   }
 
