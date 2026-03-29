@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details - Mummy J Emporium</title>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;800&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
-
     <style>
         :root {
             --navy: #12256B;
@@ -17,163 +15,104 @@
             --danger: #ff3b30;
             --success: #28a745;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; color: var(--navy); background-color: #fff; padding-top: 100px; }
         .container { max-width: 1300px; margin: 0 auto; padding: 0 5%; }
-
-        /* --- BACK ARROW --- */
         .back-arrow {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1100;
-            background: white;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            text-decoration: none;
-            color: var(--navy);
-            transition: 0.3s;
+            position: fixed; top: 20px; left: 20px; z-index: 1100;
+            background: white; width: 45px; height: 45px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); text-decoration: none;
+            color: var(--navy); transition: 0.3s;
         }
         .back-arrow:hover { transform: translateX(-5px); background: var(--navy); color: white; }
 
-        /* --- NAVBAR --- */
+        /* CART FAB — positioned top-right, never overlaps navbar logo */
+        .cart-fab {
+            position: fixed; top: 18px; right: 24px; z-index: 1200;
+            background: var(--navy); color: white;
+            width: 48px; height: 48px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 16px rgba(18,37,107,0.28);
+            text-decoration: none; transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .cart-fab:hover { transform: scale(1.1); box-shadow: 0 8px 24px rgba(18,37,107,0.4); }
+        .cart-fab svg { width: 22px; height: 22px; }
+        .cart-badge {
+            position: absolute; top: -5px; right: -5px;
+            background: #446CFF; color: white;
+            font-size: 10px; font-weight: 900;
+            min-width: 20px; height: 20px; border-radius: 10px;
+            padding: 0 5px;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid white;
+            opacity: 0; transform: scale(0);
+            transition: opacity 0.2s, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .cart-badge.visible { opacity: 1; transform: scale(1); }
+        @keyframes badgeBump {
+            0%   { transform: scale(1); }
+            40%  { transform: scale(1.6); }
+            100% { transform: scale(1); }
+        }
+        .cart-badge.bump { animation: badgeBump 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+
         .navbar { 
             position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
             background: white; display: flex; justify-content: center;
             align-items: center; padding: 15px 5%; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
         .logo-img { height: 55px; width: auto; cursor: pointer; }
-
-        /* --- PRODUCT PAGE LAYOUT --- */
         .product-wrapper {
-            display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
-            gap: 60px;
-            padding: 40px 0;
+            display: grid; grid-template-columns: 1.2fr 0.8fr;
+            gap: 60px; padding: 40px 0;
         }
-
         .main-img-container {
-            background: var(--bg-card);
-            border-radius: 35px;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 500px;
-            position: relative;
-            overflow: hidden;
+            background: var(--bg-card); border-radius: 35px; padding: 40px;
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 500px; position: relative; overflow: hidden;
         }
-
         .image-carousel {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            scroll-behavior: smooth;
-            width: 100%;
-            gap: 20px;
+            display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+            scroll-behavior: smooth; width: 100%; gap: 0;
             -webkit-overflow-scrolling: touch;
         }
-        
         .image-carousel::-webkit-scrollbar { display: none; }
-
         .image-carousel img {
-            width: 100%;
-            flex-shrink: 0;
-            max-height: 500px;
-            object-fit: contain;
-            scroll-snap-align: center;
-            transition: 0.3s;
+            width: 100%; flex: 0 0 100%; max-height: 500px;
+            object-fit: contain; scroll-snap-align: start; transition: 0.3s;
         }
-
-        .carousel-dots {
-            display: flex;
-            gap: 8px;
-            margin-top: 20px;
-        }
-
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #ccc;
-            transition: 0.3s;
-        }
+        .carousel-dots { display: flex; gap: 8px; margin-top: 20px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; transition: 0.3s; }
         .dot.active { background: var(--blue); width: 20px; border-radius: 10px; }
-
         .product-info { position: sticky; top: 140px; height: fit-content; }
         .brand-label { color: var(--blue); font-weight: 700; letter-spacing: 2px; font-size: 12px; margin-bottom: 10px; display: block; }
         .product-title { font-family: 'Anton', sans-serif; font-size: 48px; line-height: 1.1; margin-bottom: 15px; }
-        
         .price-wrapper { display: flex; align-items: baseline; gap: 15px; margin-bottom: 20px; }
         .product-price { font-size: 32px; font-weight: 800; color: var(--navy); }
         .old-price { font-size: 20px; color: var(--danger); text-decoration: line-through; font-weight: 600; opacity: 0.8; }
-
-        .product-description {
-            font-size: 15px;
-            line-height: 1.6;
-            color: #555;
-            margin-bottom: 25px;
-            white-space: pre-line;
-        }
-
-        .stock-status-badge {
-            display: inline-block;
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
+        .product-description { font-size: 15px; line-height: 1.6; color: #555; margin-bottom: 25px; white-space: pre-line; }
+        .stock-status-badge { display: inline-block; padding: 6px 15px; border-radius: 20px; font-size: 12px; font-weight: 800; margin-bottom: 20px; text-transform: uppercase; }
         .status-in { background: #e8f5e9; color: var(--success); }
         .status-out { background: #ffebee; color: var(--danger); }
-
         .color-section { margin: 25px 0; }
         .selector-label { font-weight: 700; font-size: 13px; color: #888; margin-bottom: 15px; display: block; letter-spacing: 1px; }
         .color-grid { display: flex; gap: 15px; flex-wrap: wrap; }
-        .color-swatch {
-            width: 35px; 
-            height: 35px; 
-            border-radius: 50%; 
-            border: 2px solid #ddd; 
-            cursor: pointer; 
-            transition: 0.3s;
-            position: relative;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .color-swatch.active { 
-            border-color: var(--blue); 
-            transform: scale(1.2); 
-            box-shadow: 0 0 10px rgba(68, 108, 255, 0.4);
-        }
-
+        .color-swatch { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer; transition: 0.3s; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .color-swatch.active { border-color: var(--blue); transform: scale(1.2); box-shadow: 0 0 10px rgba(68, 108, 255, 0.4); }
         .buy-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 30px; }
         .btn-atc { background: var(--navy); color: white; border: none; padding: 20px; border-radius: 15px; font-weight: 700; cursor: pointer; transition: 0.3s; }
         .btn-atc:hover:not(:disabled) { transform: translateY(-2px); opacity: 0.9; }
         .btn-whatsapp { background: #25d366; color: white; text-align: center; padding: 20px; border-radius: 15px; text-decoration: none; font-weight: 700; transition: 0.3s; }
         .btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3); }
-
-        /* --- ADMIN PANEL --- */
-        #adminControls {
-            margin-top: 40px; padding: 25px; background: #fff; 
-            border: 3px solid #000; border-radius: 25px; display: none; 
-        }
+        #adminControls { margin-top: 40px; padding: 25px; background: #fff; border: 3px solid #000; border-radius: 25px; display: none; }
         .admin-header { font-size: 14px; font-weight: 900; color: #000; margin-bottom: 15px; display: block; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        
         .admin-input-group { margin-bottom: 15px; }
         .admin-input-group label { display: block; font-size: 11px; font-weight: 800; margin-bottom: 5px; color: #666; }
         .admin-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-family: 'Inter'; font-weight: 600; }
-        
         .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; margin-bottom: 15px; }
         .btn-save { width: 100%; background: var(--blue); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
         .btn-del { width: 100%; background: #fff; color: var(--danger); border: 1px solid var(--danger); padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
-
         .admin-image-manager, .admin-color-manager { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
         .image-edit-list, .color-edit-list { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 10px; }
         .image-edit-card, .color-edit-card { position: relative; flex-shrink: 0; width: 80px; height: 80px; border-radius: 10px; overflow: hidden; border: 1px solid #ddd; }
@@ -181,24 +120,14 @@
         .color-edit-card { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5px; background: #f9f9f9; }
         .color-preview-box { width: 30px; height: 30px; border-radius: 50%; margin-bottom: 5px; border: 1px solid #ccc; }
         .color-name-label { font-size: 9px; font-weight: 700; text-align: center; overflow: hidden; text-overflow: ellipsis; width: 100%; }
-        
         .del-img-btn { position: absolute; top: 2px; right: 2px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        
-        #replacementUrlField, #newColorField { 
-            margin-top: 10px; 
-            padding: 15px; 
-            background: #f9f9f9; 
-            border-radius: 12px; 
-            border: 1px solid #eee;
-        }
-
+        #replacementUrlField, #newColorField { margin-top: 10px; padding: 15px; background: #f9f9f9; border-radius: 12px; border: 1px solid #eee; }
         .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
         .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--success); }
         input:checked + .slider:before { transform: translateX(24px); }
-
         #successOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(18, 37, 107, 0.95); backdrop-filter: blur(10px);
@@ -212,7 +141,6 @@
         .checkmark-circle { width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 25px; }
         .checkmark-circle svg { width: 60px; height: 60px; color: var(--navy); }
         .success-text { font-family: 'Anton', sans-serif; font-size: 32px; text-transform: uppercase; }
-
         @media (max-width: 992px) {
             body { padding-top: 80px; }
             .product-wrapper { grid-template-columns: 1fr; gap: 30px; padding: 20px 0; }
@@ -228,6 +156,14 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
         <path d="M19 12H5M12 19l-7-7 7-7"/>
     </svg>
+</a>
+
+<!-- CART FAB — fixed top-right, updates live when items added -->
+<a href="cart.html" class="cart-fab" id="cartFab" title="View Cart">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.836l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.273M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+    </svg>
+    <span class="cart-badge" id="cartBadge">0</span>
 </a>
 
 <header class="navbar">
@@ -360,6 +296,28 @@
     let tempImages = [];
     let tempColors = [];
 
+    // ── CART BADGE ─────────────────────────────────────────────────
+    function updateCartBadge(bump) {
+        const cart = JSON.parse(localStorage.getItem('mj_cart')) || [];
+        const badge = document.getElementById('cartBadge');
+        if (!badge) return;
+        const count = cart.length;
+        badge.innerText = count;
+        if (count > 0) {
+            badge.classList.add('visible');
+            if (bump) {
+                badge.classList.remove('bump');
+                void badge.offsetWidth; // force reflow to restart animation
+                badge.classList.add('bump');
+            }
+        } else {
+            badge.classList.remove('visible');
+        }
+    }
+    // Show count on page load
+    updateCartBadge(false);
+    // ───────────────────────────────────────────────────────────────
+
     window.triggerSuccess = (title, sub) => {
         const overlay = document.getElementById('successOverlay');
         document.getElementById('overlayTitle').innerText = title || "SUCCESS";
@@ -451,27 +409,22 @@
         updateWA();
     }
 
-    // --- ADMIN COLOR RENDERER ---
     function renderAdminColors() {
         const list = document.getElementById('adminColorList');
         list.innerHTML = "";
         tempColors.forEach((c, index) => {
             const card = document.createElement('div');
             card.className = "color-edit-card";
-            
             const prev = document.createElement('div');
             prev.className = "color-preview-box";
             prev.style.backgroundColor = c.hex;
-            
             const label = document.createElement('span');
             label.className = "color-name-label";
             label.innerText = c.name;
-            
             const delBtn = document.createElement('button');
             delBtn.className = "del-img-btn";
             delBtn.innerHTML = "&times;";
             delBtn.onclick = () => removeColor(index);
-            
             card.appendChild(prev);
             card.appendChild(label);
             card.appendChild(delBtn);
@@ -499,7 +452,6 @@
         }
     };
 
-    // --- ADMIN IMAGE RENDERER ---
     function renderAdminImages() {
         const list = document.getElementById('adminImageList');
         list.innerHTML = "";
@@ -600,6 +552,7 @@
         });
         localStorage.setItem('mj_cart', JSON.stringify(cart));
         triggerSuccess("ADDED", "Item added to your cart!");
+        updateCartBadge(true); // ← update badge with bounce animation
     };
 
     fetchProduct();
